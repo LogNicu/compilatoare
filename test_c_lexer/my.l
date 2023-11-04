@@ -2,33 +2,37 @@
 
 %{
 #include <stdio.h>
+#include "enum_gen.h"
 
-typedef enum {
-  SEMICOL,
-  COMMA,
-  INT,
-  ACCOL_OPEN,
-  ACCOL_CLOSE,
-  /////////
-  PLUS,
-  MINUS,
-  DIV,
+DEFINE_ENUM(
+  TokenType, 
+  SEMICOL, 
+  COMMA, 
+  INT, 
+  ACCOL_OPEN, 
+  ACCOL_CLOSE, 
+  AND,
+  OR,
+  PLUS, 
+  MINUS, 
+  DIV, 
   STAR,
-  //////
-  LEFT_PAREN,
-  RIGHT_PAREN,
-  /////
-  NUMBER,
-  /////
-  IDENTIFIER,
-  RETURN
-} TokenType;
+  EQUAL,
+  LESS,
+  GREATER,
+  LEFT_PAREN, 
+  RIGHT_PAREN, 
+  NUMBER, 
+  IDENTIFIER, 
+  RETURN,
+  DATA_TYPE,
+  IF,
+  ELSE,
+  DO,
+  WHILE,
+  FOR
+)
 
-
-const char* tokenTypeToStr(TokenType type) {
-  static const char* tokTypeArr[] ={  "SEMICOL","COMMA","INT","ACCOL_OPEN","ACCOL_CLOSE","PLUS","MINUS","DIV","STAR","LEFT_PAREN","RIGHT_PAREN","NUMBER","IDENTIFIER","RETURN"};
-  return tokTypeArr[type];
-}
 typedef struct {
   TokenType tokType;
   char* lexemme;
@@ -43,13 +47,15 @@ void emitToken(TokenType tType, const char* yytext) {
 }
 
 %}
-
-COMMENT @.*
-NUMBER -?[0-9]*\.?[0-9]*
 WHT [ \t\n\r]
+COMMENT_LINE \/\/.*\n
+COMMENT_BLOCK \/\*(.|{WHT})*\*\/
+NUMBER -?[0-9]*\.?[0-9]*
 %%
 \; emitToken(SEMICOL, yytext);
 , emitToken(COMMA,yytext);
+\& emitToken(AND, yytext);
+\| emitToken(OR, yytext);
 \+ emitToken(PLUS,yytext);
 - emitToken(MINUS,yytext);
 \* emitToken(STAR,yytext);
@@ -58,27 +64,39 @@ WHT [ \t\n\r]
 \} emitToken(ACCOL_CLOSE,yytext);
 \( emitToken(LEFT_PAREN,yytext);
 \) emitToken(RIGHT_PAREN,yytext);
+= emitToken(EQUAL,yytext);
+\< emitToken(LESS, yytext);
+> emitToken(GREATER, yytext);
 {NUMBER} emitToken(NUMBER,yytext);
 "return" emitToken(RETURN,yytext);
 "int" emitToken(INT,yytext);
-{WHT} {}
+"if", emitToken(IF,yytext);
+"else", emitToken(ELSE,yytext);
+"do", emitToken(DO,yytext);
+"while", emitToken(WHILE,yytext);
+"for"  emitToken(FOR, yytext);
+"struct"  emitToken(FOR, yytext);
+"enum"  emitToken(FOR, yytext);
+{WHT}|{COMMENT_LINE}|{COMMENT_BLOCK} {}
 [a-zA-Z]* emitToken(IDENTIFIER,yytext);
 . printf("UNKNOWN: %s\n", yytext);
 %%
-
+/*
+*/
 
 int main(int argc, char **argv)
 {
     while (yylex() != 0);
-    printf("MAX IDX: %d\n",idx);
+
     // for(int i = 0; i < idx; i++) {
     //   printf("TOKEN: %s | type: %s\n",arr[i].lexemme, tokenTypeToStr(arr[i].tokType));
     // }
     for(int i = 0; i < idx; i++) {
-      printf("%s{%s} ", tokenTypeToStr(arr[i].tokType), arr[i].lexemme);
+      printf("%s\x1b[36m{\x1b[31m%s\x1b[36m}\x1b[0m ", TokenTypeToStr(arr[i].tokType), arr[i].lexemme);
       if(arr[i].tokType == ACCOL_OPEN || arr[i].tokType == ACCOL_CLOSE || arr[i].tokType == SEMICOL ) {
         printf("\n");
       }
     }
+    
 }
 
