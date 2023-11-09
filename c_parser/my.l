@@ -41,6 +41,10 @@ CHAR_LITERAL \'.\'
 "for"  {yylval.op_val = new std::string(yytext);return FOR;}
 "enum"  {yylval.op_val = new std::string(yytext);return FOR;}
 "break" {yylval.op_val = new std::string(yytext);return BREAK;}
+"int" {yylval.op_val = new std::string(yytext);return INT_KEYWORD;}
+"float" {yylval.op_val = new std::string(yytext);return FLOAT_KEYWORD;}
+"char" {yylval.op_val = new std::string(yytext);return CHAR_KEYWORD;}
+"void" {yylval.op_val = new std::string(yytext);return VOID_KEYWORD;}
 "#.*\n" printf("PREPROCESSOR: -> ignore: %s", yytext);
 {WHT}|{COMMENT_LINE}|{COMMENT_BLOCK} {}
 [a-zA-Z]* {yylval.op_val = new std::string(yytext);return IDENTIFIER;}

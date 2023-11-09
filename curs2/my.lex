@@ -8,7 +8,9 @@ COMMENT @.*
 DIRECTIVE \..*
 REG lr|ldr|sp|fp|r[0-9]{1,2}
 NUMBER #-?[0-9]{1,2}
-MEM \[{WHT}*{REG}{WHT}*,{WHT}*{NUMBER}{WHT}*\]!?
+MEM1 \[{WHT}*{REG}{WHT}*,{WHT}*{NUMBER}{WHT}*\]!?
+MEM2 \[{REG}\]
+MEM {MEM1}|{MEM2}
 OP1 {REG}
 OP2 {REG}|{MEM}|{NUMBER}
 NAME [a-zA-Z][a-zA-Z_0-9]*

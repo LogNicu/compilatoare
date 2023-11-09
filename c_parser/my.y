@@ -48,7 +48,11 @@ int yylex(void);
 %token  WHILE
 %token  FOR
 %token  BREAK
-
+///////TYPES
+%token INT_KEYWORD
+%token FLOAT_KEYWORD
+%token CHAR_KEYWORD
+%token VOID_KEYWORD
 ////////////
 
 %%
@@ -66,13 +70,20 @@ statement: exp SEMICOL  {std::cout<<"Result: "<<$1<< endl;} |
 
 
 
-fundecl: IDENTIFIER IDENTIFIER RIGHT_PAREN param_list LEFT_PAREN ACCOL_OPEN statement_list ACCOL_CLOSE {std::cout<<"fundecl: "<< endl;}
+fundecl: type_specifier IDENTIFIER RIGHT_PAREN param_list LEFT_PAREN ACCOL_OPEN statement_list ACCOL_CLOSE {std::cout<<"fundecl: "<< endl;}
 
 param_list: /*empty */ 
 	| vardecl
 	| vardecl COMMA param_list
 
-vardecl: IDENTIFIER IDENTIFIER 
+vardecl: type_specifier IDENTIFIER 
+
+type_specifier: INT_KEYWORD
+             | FLOAT_KEYWORD
+             | CHAR_KEYWORD
+             | VOID_KEYWORD
+             | IDENTIFIER /* what do i do about user defined types ? */
+             ;
 
 exp: literal | unary | binary | grouping;
 

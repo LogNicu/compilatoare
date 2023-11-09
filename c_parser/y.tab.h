@@ -86,7 +86,11 @@ extern int yydebug;
     DO = 287,                      /* DO  */
     WHILE = 288,                   /* WHILE  */
     FOR = 289,                     /* FOR  */
-    BREAK = 290                    /* BREAK  */
+    BREAK = 290,                   /* BREAK  */
+    INT_KEYWORD = 291,             /* INT_KEYWORD  */
+    FLOAT_KEYWORD = 292,           /* FLOAT_KEYWORD  */
+    CHAR_KEYWORD = 293,            /* CHAR_KEYWORD  */
+    VOID_KEYWORD = 294             /* VOID_KEYWORD  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -128,6 +132,10 @@ extern int yydebug;
 #define WHILE 288
 #define FOR 289
 #define BREAK 290
+#define INT_KEYWORD 291
+#define FLOAT_KEYWORD 292
+#define CHAR_KEYWORD 293
+#define VOID_KEYWORD 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -138,7 +146,7 @@ union YYSTYPE
     double num_val;
     std::string* op_val;
 
-#line 142 "y.tab.h"
+#line 150 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
