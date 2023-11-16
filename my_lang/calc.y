@@ -28,12 +28,13 @@ void yyerror(const char *s) {
 /* Declare tokens and types for various values */
 %token <number> NUM
 %token <id_val> IDENTIFIER
+%token <id_val> FUN
 %type<number> vardecl
 %type<number> operand
+%type<number>fun_call
 %type <number> exp
 %type <number> exp_mult_div
 %type <number> exp_group_op_neg
-
 /* Grammar for a simple calculator */
 %%
 input:    /* empty string */
@@ -41,26 +42,39 @@ input:    /* empty string */
 ;
 
 ;
-line:     '\n'
+/* line:     '\n'
         | exp '\n' {printf("Result: %d\n", $1);}
         | vardecl '\n' {printf("Declared var with value: %d\n", $1);}
-        | fundecl
-        
+        | fundecl 
 ;
+*/
+line: fundecl | statement
+
+statement: exp ';'
+        | vardecl ';'
+;
+
+fun_call: IDENTIFIER '(' ')' {$$ = 0;}
 
 vardecl: IDENTIFIER '=' exp {$$ = $3; varMap[std::string($1)] = $3; }
 ;
 
 operand: NUM {$$ = $1;}
         | IDENTIFIER {$$ = varMap[std::string($1)]; }
+        | fun_call
+;
 
-fundecl: IDENTIFIER '(' param_list ')' code_block
+fundecl: FUN  IDENTIFIER '(' param_list ')' code_block
+;
 
 param_list: /*empty */ 
 	| IDENTIFIER
 	| IDENTIFIER ',' param_list
+;
 
-code_block: '{' line '}' {printf("current: %d", current_block++);}
+code_block: /*empty*/ 
+        | code_block  statement
+;
 
 exp:    exp_mult_div  {$$ = $1;}
         | exp_mult_div '+' exp_mult_div     { $$ = $1 + $3;    }

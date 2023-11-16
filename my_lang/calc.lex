@@ -16,7 +16,8 @@ WHT [ \t\r]
 
 [0-9]+("."[0-9]+)?  {yylval.number=atof(yytext); return NUM;}/* parse a floating point number */
 [a-zA-Z]* {yylval.id_val =strdup(yytext); return IDENTIFIER;}
-[{},=*+-/\n()] return *yytext; /* parse punctuation and end-of-line characters */
+"fun" {yylval.id_val =strdup(yytext); return FUN;}
+[;{},=*+-/\n()] return *yytext; /* parse punctuation and end-of-line characters */
 
 
 . 	printf("Invalid character in expression: %s\n", yytext); exit(1);
