@@ -366,8 +366,8 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[18] =
     {   0,
-        3,    3,    8,    6,    1,    5,    5,    2,    3,    3,
-        0,    2,    3,    3,    2,    3,    0
+        4,    4,    8,    6,    1,    1,    5,    2,    4,    4,
+        0,    2,    4,    4,    2,    3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -734,39 +734,39 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
+/* rule 1 can match eol */
 YY_RULE_SETUP
 #line 15 "calc.lex"
 /* Skip whitespace */
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 17 "calc.lex"
+#line 16 "calc.lex"
 {yylval.number=atof(yytext); return NUM;}/* parse a floating point number */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 18 "calc.lex"
-{yylval.id_val =strdup(yytext); return IDENTIFIER;}
+#line 17 "calc.lex"
+{yylval.id_val = strdup(yytext); return FUN;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 19 "calc.lex"
-{yylval.id_val =strdup(yytext); return FUN;}
+#line 18 "calc.lex"
+{yylval.id_val = strdup(yytext); return IDENTIFIER;}
 	YY_BREAK
 case 5:
-/* rule 5 can match eol */
 YY_RULE_SETUP
-#line 20 "calc.lex"
+#line 19 "calc.lex"
 return *yytext; /* parse punctuation and end-of-line characters */
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 23 "calc.lex"
+#line 22 "calc.lex"
 printf("Invalid character in expression: %s\n", yytext); exit(1);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 25 "calc.lex"
+#line 24 "calc.lex"
 ECHO;
 	YY_BREAK
 #line 773 "calc.yy.c"
@@ -1774,6 +1774,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 25 "calc.lex"
+#line 24 "calc.lex"
 
 
