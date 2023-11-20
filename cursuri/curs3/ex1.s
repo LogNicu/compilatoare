@@ -1,6 +1,6 @@
 	.file	"ex1.c"
-	.option pic
-	.attribute arch, "rv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0_zifencei2p0"
+	.option nopic
+	.attribute arch, "rv64i2p0_m2p0_a2p0_f2p0_d2p0_c2p0"
 	.attribute unaligned_access, 0
 	.attribute stack_align, 16
 	.text
@@ -8,70 +8,137 @@
 	.globl	f1
 	.type	f1, @function
 f1:
-.LFB0:
-	.cfi_startproc
-	li	a0,45
-	ret
-	.cfi_endproc
-.LFE0:
+	addi	sp,sp,-16
+	sd	s0,8(sp)
+	addi	s0,sp,16
+	li	a5,45
+	mv	a0,a5
+	ld	s0,8(sp)
+	addi	sp,sp,16
+	jr	ra
 	.size	f1, .-f1
 	.align	1
 	.globl	f2
 	.type	f2, @function
 f2:
-.LFB1:
-	.cfi_startproc
-	addiw	a0,a0,2
-	ret
-	.cfi_endproc
-.LFE1:
+	addi	sp,sp,-32
+	sd	s0,24(sp)
+	addi	s0,sp,32
+	mv	a5,a0
+	sw	a5,-20(s0)
+	lw	a5,-20(s0)
+	addiw	a5,a5,2
+	sext.w	a5,a5
+	mv	a0,a5
+	ld	s0,24(sp)
+	addi	sp,sp,32
+	jr	ra
 	.size	f2, .-f2
 	.align	1
 	.globl	f3
 	.type	f3, @function
 f3:
-.LFB2:
-	.cfi_startproc
-	li	a5,2
-	subw	a0,a5,a0
-	ret
-	.cfi_endproc
-.LFE2:
+	addi	sp,sp,-32
+	sd	s0,24(sp)
+	addi	s0,sp,32
+	mv	a5,a0
+	sw	a5,-20(s0)
+	li	a4,2
+	lw	a5,-20(s0)
+	subw	a5,a4,a5
+	sext.w	a5,a5
+	mv	a0,a5
+	ld	s0,24(sp)
+	addi	sp,sp,32
+	jr	ra
 	.size	f3, .-f3
 	.align	1
 	.globl	f4
 	.type	f4, @function
 f4:
-.LFB3:
-	.cfi_startproc
+	addi	sp,sp,-32
+	sd	s0,24(sp)
+	addi	s0,sp,32
+	mv	a5,a0
+	sw	a5,-20(s0)
+	lw	a4,-20(s0)
 	li	a5,1375
-	mulw	a0,a5,a0
-	ret
-	.cfi_endproc
-.LFE3:
+	mulw	a5,a4,a5
+	sext.w	a5,a5
+	mv	a0,a5
+	ld	s0,24(sp)
+	addi	sp,sp,32
+	jr	ra
 	.size	f4, .-f4
 	.align	1
 	.globl	f5
 	.type	f5, @function
 f5:
-.LFB4:
-	.cfi_startproc
-	li	a5,6
-	divw	a0,a5,a0
-	ret
-	.cfi_endproc
-.LFE4:
+	addi	sp,sp,-32
+	sd	s0,24(sp)
+	addi	s0,sp,32
+	mv	a5,a0
+	sw	a5,-20(s0)
+	li	a4,6
+	lw	a5,-20(s0)
+	divw	a5,a4,a5
+	sext.w	a5,a5
+	mv	a0,a5
+	ld	s0,24(sp)
+	addi	sp,sp,32
+	jr	ra
 	.size	f5, .-f5
 	.align	1
 	.globl	f6
 	.type	f6, @function
 f6:
-.LFB5:
-	.cfi_startproc
-	negw	a0,a0
-	ret
-	.cfi_endproc
-.LFE5:
+	addi	sp,sp,-32
+	sd	s0,24(sp)
+	addi	s0,sp,32
+	mv	a5,a0
+	sw	a5,-20(s0)
+	lw	a5,-20(s0)
+	negw	a5,a5
+	sext.w	a5,a5
+	mv	a0,a5
+	ld	s0,24(sp)
+	addi	sp,sp,32
+	jr	ra
 	.size	f6, .-f6
-	.ident	"GCC: (Ubuntu 13.2.0-4ubuntu3) 13.2.0"
-	.section	.note.GNU-stack,"",@progbits
+	.align	1
+	.globl	f7
+	.type	f7, @function
+f7:
+	addi	sp,sp,-32
+	sd	ra,24(sp)
+	sd	s0,16(sp)
+	addi	s0,sp,32
+	lw	a5,-20(s0)
+	mv	a0,a5
+	call	f6
+	mv	a5,a0
+	sw	a5,-20(s0)
+	lw	a5,-20(s0)
+	mv	a0,a5
+	ld	ra,24(sp)
+	ld	s0,16(sp)
+	addi	sp,sp,32
+	jr	ra
+	.size	f7, .-f7
+	.align	1
+	.globl	main
+	.type	main, @function
+main:
+	addi	sp,sp,-16
+	sd	ra,8(sp)
+	sd	s0,0(sp)
+	addi	s0,sp,16
+	call	f7
+	mv	a5,a0
+	mv	a0,a5
+	ld	ra,8(sp)
+	ld	s0,0(sp)
+	addi	sp,sp,16
+	jr	ra
+	.size	main, .-main
+	.ident	"GCC: () 10.2.0"

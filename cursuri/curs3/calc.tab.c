@@ -1081,7 +1081,7 @@ yyreduce:
     {
   case 4: /* X: %empty  */
 #line 31 "calc.y"
-   {printf("funcno:%d",funcno++);}
+   {printf("funcno:%d\n\n",funcno++);}
 #line 1086 "calc.tab.c"
     break;
 

@@ -28,7 +28,7 @@ int funcno = 0;
 input:    /* empty string */
         | input line
 ;
-X: {printf("funcno:%d\n",funcno++);}
+X: {printf("funcno:%d\n\n",funcno++);}
 ;
 line:     '\n'
         | X exp '\n'  {printf("\tmowv a0, a%d\n\tret\n", $2); }

@@ -17,3 +17,12 @@ int f5(int a) {
 int f6(int a) {
     return -a;
 }
+
+int f7() {
+    int x = f6(x);
+    return x;
+}
+
+int main() {
+    return f7();
+}

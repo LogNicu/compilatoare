@@ -1,0 +1,3 @@
+/home/nicu/compilatoare/cpp_compiler/cmake-build-debug/CMakeFiles/cpp_compiler.dir
+/home/nicu/compilatoare/cpp_compiler/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/nicu/compilatoare/cpp_compiler/cmake-build-debug/CMakeFiles/rebuild_cache.dir
