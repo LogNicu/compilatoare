@@ -18,7 +18,8 @@ const std::unordered_map<Token::Type,std::string> Token::toStr = {
 
 [[nodiscard]] std::string Token::toString() const {
     const Token &t = *this;
-    return  "{"+toStr.at(t.type)+", "+std::to_string(t.value)+", '"+t.symbol+"'}";
+    return  std::string("{")+"\033[91m"+toStr.at(t.type)+"\033[0m, "+
+    std::to_string(t.value)+(t.type != NUMBER && t.type != M_EOF ? std::string(", '")+t.symbol+"'}": "}");
 }
 [[nodiscard]] std::string Token::typeToStr() const {
     return  toStr.at(this->type);

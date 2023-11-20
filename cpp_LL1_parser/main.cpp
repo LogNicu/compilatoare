@@ -11,7 +11,7 @@ int main() {
     while(std::getline(std::cin,line)) {
         Parser p(line);
         line+=EOF;
-        std::cout<<"Result: "<<p.parseExpr()<<"\n";
+        std::cout<<"Result:\n"<<p.parseExpr()<<"\n\n";
 
     }
     return 0;
