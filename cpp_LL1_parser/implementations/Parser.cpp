@@ -137,7 +137,7 @@ double Parser::parseTermP(double val) {
 #endif
         double  val3 = parseTermP(val*val2);
 #ifdef DEBUG_LEVEL2
-        currentIndent(); std::cout<<"val3 from parseExprP("<<val<<"*"<<val2<<") = "<<val3<<"\n";
+        currentIndent(); std::cout<<"val3 from parseTermP("<<val<<"*"<<val2<<") = "<<val3<<"\n";
 #endif
         debug2();
         return  val3;
@@ -148,7 +148,7 @@ double Parser::parseTermP(double val) {
 #endif
         double  val3 = parseTermP(val/val2);
 #ifdef DEBUG_LEVEL2
-        currentIndent(); std::cout<<"val3 from parseExprP("<<val<<"/"<<val2<<") = "<<val3<<"\n";
+        currentIndent(); std::cout<<"val3 from parseTermP("<<val<<"/"<<val2<<") = "<<val3<<"\n";
 #endif
         debug2();
         return val3;
