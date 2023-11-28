@@ -12,6 +12,7 @@ class Parser {
 public:
     Parser(std::string &s);
     double parseExpr();
+    double parseEquality();
     double parseComparison();
     double parseTerm();
     double parseFactor();

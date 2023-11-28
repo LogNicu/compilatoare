@@ -45,21 +45,45 @@ void Parser::expectType(Token t, Token::Type type) {
 }
 
 double Parser::parseExpr() {
-    return parseComparison();
+    return parseEquality();
+}
+
+double Parser::parseEquality() {
+    double val1 = parseComparison();
+    Token next = lex.peek();
+    if(next.type != Token::M_EOF && match(next, {Token::EQ_EQ,Token::BANG_EQ})) lex.next();
+    while (next.type != Token::M_EOF && match(next, {Token::EQ_EQ,Token::BANG_EQ})) {
+        if(next.type == Token::EQ_EQ) {
+            val1 = val1 == parseComparison();
+        }
+        if(next.type == Token::BANG_EQ) {
+            val1 = val1 != parseComparison();
+        }
+        if((lex.peek().type != Token::M_EOF && match(lex.peek(), {Token::EQ_EQ,Token::BANG_EQ})))
+            next = lex.next();
+        else break;
+    }
+    return val1;
 }
 
 double Parser::parseComparison() {
     double val1 = parseTerm();
     Token next = lex.peek();
-    if(next.type != Token::M_EOF && match(next, {Token::GT,Token::LT})) lex.next();
-    while (next.type != Token::M_EOF && match(next, {Token::GT,Token::LT})) {
+    if(next.type != Token::M_EOF && match(next, {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})) lex.next();
+    while (next.type != Token::M_EOF && match(next, {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})) {
         if(next.type == Token::GT) {
             val1 = val1 > parseTerm();
         }
         if(next.type == Token::LT) {
             val1 = val1 < parseTerm();
         }
-        if((lex.peek().type != Token::M_EOF && match(lex.peek(), {Token::GT,Token::LT})))
+        if(next.type == Token::GT_EQ) {
+            val1 = val1 >= parseTerm();
+        }
+        if(next.type == Token::LT_EQ) {
+            val1 = val1 <= parseTerm();
+        }
+        if((lex.peek().type != Token::M_EOF && match(lex.peek(), {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})))
             next = lex.next();
         else break;
     }
@@ -104,10 +128,10 @@ double Parser::parseFactor() {
 
 double Parser::parseUnary() {
     Token tok = lex.peek();
-    if(tok.type == Token::EXCLAMATION) {
+    if(match(tok,{Token::BANG,Token::MINUS})) {
         lex.next();
         double val = parseUnary();
-        return !val;
+        return tok.type == Token::BANG ? !val : -val;
     }else{
         return parsePrimary();
     }
@@ -118,7 +142,7 @@ double Parser::parsePrimary() {
     if(next.type == Token::NUMBER) {
         return next.value;
     }else if(next.type == Token::O_PAREN) {
-        double value = parseTerm();
+        double value = parseExpr();
         expectType(lex.next(),Token::C_PAREN);
         return value;
     }
@@ -141,6 +165,8 @@ bool Parser::match(Token t, std::vector<Token::Type> types) {
 void Parser::advance() {
 
 }
+
+
 
 
 

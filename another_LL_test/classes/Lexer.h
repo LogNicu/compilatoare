@@ -18,12 +18,16 @@ public:
         STAR = '*',
         O_PAREN = '(',
         C_PAREN = ')',
-        EXCLAMATION = '!',
+        BANG = '!',
         GT = '>',
         LT = '<',
         // If i am to assign ascii values to some enum values, the other ones should be
         // outside the ASCII range if i want to have safe automatic value assignment
-        NUMBER = 128,
+        GT_EQ = 128, // >=
+        LT_EQ, // <=
+        EQ_EQ, // ==
+        BANG_EQ, // !=
+        NUMBER,
         M_EOF
     };
 private:
