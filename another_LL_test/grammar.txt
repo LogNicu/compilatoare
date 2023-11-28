@@ -1,0 +1,7 @@
+
+comparison: term ( ( ">" |  "<"  ) term )* ; //TODO rust doesn't seem to support chaining such as 6>3>1
+term: factor ( '+' | '-' factor)*
+factor: unary ('*' | '/' unary)*
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary: NUMBER | '(' expr ')'
