@@ -1,3 +1,4 @@
+#!/home/nicu/Projects/compilatoare/another_LL_test/venv/bin/python3
 import random
 import subprocess
 import re
@@ -56,8 +57,11 @@ def main():
         # Run the command and capture its output
         result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
 
-        valueFromParser = eval(result.stdout)
-
+        try:
+            valueFromParser = eval(result.stdout)
+        except Exception as e:
+            print(e)
+            print(expression)
         if value != valueFromParser:
             print("Expression: ",expression)
             print("Python expression: ",pythonExpression)

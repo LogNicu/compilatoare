@@ -52,7 +52,6 @@ class Lexer{
 public:
     explicit Lexer(std::string &text);
     Token next();
-    Token peek();
 };
 
 
