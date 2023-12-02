@@ -15,7 +15,7 @@ class Parser {
     Token peek();
     Token previous();
 public:
-    Parser(std::string &s);
+    Parser(std::string s);
     double parseExpr();
     double parseEquality();
     double parseComparison();
