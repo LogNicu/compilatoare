@@ -15,7 +15,6 @@ class Lexer{
     yyFlexLexer *l;
     std::istringstream* stream;
     std::string text;
-    std::string::const_iterator pos;
 public:
     explicit Lexer(std::string& code);
     Token next();
