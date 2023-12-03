@@ -2,10 +2,13 @@
  Tokens for a simple expression calculator
 */
 %option c++
+%option batch
 %{
 #include "common_flex.h"
 #include <vector>
-#include<iostream>
+#include <cstdint>
+#include <unordered_set>
+#include <iostream>
 
 
 static std::vector<Token> globalVector;
@@ -22,15 +25,35 @@ WHT [ \n\t\r]
 
 {WHT}	/* Skip whitespace */
 [0-9]+("."[0-9]+)?  {
-    emitToken(Token(Token::NUMBER,  std::stod(yytext),0));/* parse a floating point number */
-    return -2;
+    emitToken({Token::NUMBER,  std::stod(yytext),0});/* parse a floating point number */
+    return Token::NUMBER;
 }
 [*+-/()!><]  {
-    emitToken(Token((Token::Type) *yytext, 0, *yytext)); /* parse punctuation and end-of-line characters */
-    return -3;
+	emitToken({(Token::Type) *yytext, 0, *yytext}); /* parse punctuation and end-of-line characters */
+	return *yytext;
 }
-<<EOF>> {emitToken(Token(Token::M_EOF)); return 0;};
-. 	printf("Invalid character in expression: %s\n", yytext); exit(1);
+
+">=" {emitToken({Token::GT_EQ}); return Token::GT_EQ;}
+
+"<=" {emitToken({Token::LT_EQ}); return Token::LT_EQ;}
+
+
+"==" {emitToken({Token::EQ_EQ}); return Token::EQ_EQ;}
+
+"!=" {emitToken({Token::BANG_EQ}); return Token::BANG_EQ;}
+
+"!" {emitToken({Token::BANG}); return Token::BANG;}
+
+<<EOF>> {emitToken({Token::M_EOF}); return Token::M_EOF;};
+
+. {
+
+	std::cout << "\033[91m";
+	std::cout<<"{"<<(int64_t)yytext[0]<<"}["<<yytext[0]<<"]\n";
+	std::cout<<"\033[0m";
+}
 
 %%
+//this produces error: (((540+608)+(!974-!811))*((!703+626)+(140*80)))
+//(((540+608)+(!974-!811))+((!703+626)+(140+80)))
 int yyFlexLexer::yywrap()   { return 1;}

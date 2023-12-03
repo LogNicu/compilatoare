@@ -37,7 +37,7 @@ def replace_not(match):
     number = match.group(1)
     return "(not {})".format(number)
 def main():
-    for i in range(0,10):
+    for i in range(0,50):
         global closed_parens
         global open_parens
 
@@ -60,7 +60,9 @@ def main():
         try:
             valueFromParser = eval(result.stdout)
         except Exception as e:
+            print("Exception from my parser")
             print(e)
+            print(pythonExpression)
             print(expression)
         if value != valueFromParser:
             print("Expression: ",expression)

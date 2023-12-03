@@ -12,12 +12,14 @@
 #include "../flex/common_flex.h"
 
 class Lexer{
-    yyFlexLexer l;
+    yyFlexLexer *l;
+    std::istringstream* stream;
     std::string text;
     std::string::const_iterator pos;
 public:
-    explicit Lexer(std::istringstream stream);
+    explicit Lexer(std::string& code);
     Token next();
+    ~Lexer();
 
 };
 

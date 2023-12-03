@@ -11,15 +11,22 @@
 
 //#######################################################################################################
 
-Lexer::Lexer(std::istringstream stream) : l(&stream, &std::cout)
+Lexer::Lexer(std::string& code)
 {
+    stream = new std::istringstream (code);
+    l = new yyFlexLexer(stream);
     pos = this->text.begin();
     //while (l.yylex());
 }
 
+Lexer::~Lexer() {
+    delete stream;
+    delete l;
+}
+
 Token Lexer::next() {
 //    yyFlexLexer();
-    l.yylex();
+    l->yylex();
     return getToken();
     //while(l.yylex()) {
         //std::cout << std::string(l.YYText(), l.YYLeng()) << "\n";
@@ -56,6 +63,8 @@ Token Lexer::next() {
     }
     throw std::runtime_error("Error: Unknown token: ");
 }
+
+
 
 #undef stringify
 
