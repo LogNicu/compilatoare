@@ -52,100 +52,77 @@ void Parser::expectType(Token t, Token::Type type) {
     }
 }
 
-double Parser::parseExpr() {
+Expression Parser::parseExpr() {
     debug();
     return parseEquality();
 }
 
-double Parser::parseEquality() {
+Expression Parser::parseEquality() {
     debug();
-    double val1 = parseComparison();
+    Expression val1 = parseComparison();
     while (match( {Token::EQ_EQ,Token::BANG_EQ})) {
         Token next = previous();
-        if(next.type == Token::EQ_EQ) {
-            val1 = val1 == parseComparison();
-        }
-        if(next.type == Token::BANG_EQ) {
-            val1 = val1 != parseComparison();
-        }
+        Expression right = parseComparison();
+        val1 = Expression(next,{val1,right});
     }
     return val1;
 }
 
-double Parser::parseComparison() {
+Expression Parser::parseComparison() {
     debug();
-    double val1 = parseTerm();
+    Expression val1 = parseTerm();
     while (match( {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})) {
         Token next = previous();
-        if(next.type == Token::GT) {
-            val1 = val1 > parseTerm();
-        }
-        if(next.type == Token::LT) {
-            val1 = val1 < parseTerm();
-        }
-        if(next.type == Token::GT_EQ) {
-            val1 = val1 >= parseTerm();
-        }
-        if(next.type == Token::LT_EQ) {
-            val1 = val1 <= parseTerm();
-        }
+        Expression right = parseTerm();
+        val1 = Expression(next,{val1,right});
     }
     return val1;
 }
 
-double Parser::parseTerm() {
+Expression Parser::parseTerm() {
     debug();
-    double val1 = parseFactor();
+    Expression val1 = parseFactor();
     while ( match( {Token::PLUS,Token::MINUS})) {
         Token next = previous();
-        if(next.type == Token::PLUS) {
-            val1 += parseFactor();
-        }
-        if(next.type == Token::MINUS) {
-            val1 -= parseFactor();
-        }
+        Expression right = parseFactor();
+        val1 = Expression(next,{val1,right});
     }
     return val1;
 }
 
-double Parser::parseFactor() {
+Expression Parser::parseFactor() {
     debug();
-    double val1 = parseUnary();
+    Expression val1 = parseUnary();
     while (match( {Token::STAR,Token::SLASH})) {
         Token next = previous();
-        if(next.type == Token::STAR) {
-            val1 *= parseUnary();
-        }
-        if(next.type == Token::SLASH) {
-            val1 /= parseUnary();
-        }
+        Expression right = parseUnary();
+        val1 = Expression(next,{val1,right});
     }
     return val1;
 }
 
-double Parser::parseUnary() {
+Expression Parser::parseUnary() {
     debug();
     if(match({Token::BANG,Token::MINUS})) {
         Token tok = previous();
-        double val = parseUnary();
-        return tok.type == Token::BANG ? !val : -val;
+        Expression val = parseUnary();
+        return Expression(tok,{val});
     }else{
         return parsePrimary();
     }
 }
 
-double Parser::parsePrimary() {
+Expression Parser::parsePrimary() {
     debug();
     if(match({Token::NUMBER})) {
-        return previous().value;
+        return Expression(previous());
     }else if(peek().type == Token::O_PAREN) {
         advance();
-        double value = parseExpr();
+        Expression value = parseExpr();
         expectType(advance(),Token::C_PAREN);
         return value;
     }
     throw std::runtime_error("Error: Unknown primary: "+peek().toString());
-    return 0;
 }
 
 

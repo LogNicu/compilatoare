@@ -26,6 +26,8 @@ add_executable(another_LL_test main.cpp
         flex/lexer.lex
         flex/flex_lexer.h
         flex/lex.yy.cc
-        flex/common_flex.h)
+        flex/common_flex.h
+        implementations/Expression.cpp
+        classes/Expression.h)
 
 add_dependencies(another_LL_test lexer_target)

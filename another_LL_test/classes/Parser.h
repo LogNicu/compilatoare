@@ -5,6 +5,7 @@
 #ifndef CPP_COMPILER_PARSER_H
 #define CPP_COMPILER_PARSER_H
 #include "Lexer.h"
+#include "Expression.h"
 
 class Parser {
     Lexer lex;
@@ -16,13 +17,13 @@ class Parser {
     Token previous();
 public:
     Parser(std::string &s);
-    double parseExpr();
-    double parseEquality();
-    double parseComparison();
-    double parseTerm();
-    double parseFactor();
-    double parsePrimary();
-    double parseUnary();
+    Expression parseExpr();
+    Expression parseEquality();
+    Expression parseComparison();
+    Expression parseTerm();
+    Expression parseFactor();
+    Expression parsePrimary();
+    Expression parseUnary();
     void expectType(Token t, Token::Type type);
     bool match(const std::vector<Token::Type>& types);
 };
