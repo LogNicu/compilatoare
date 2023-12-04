@@ -28,6 +28,7 @@ public:
         EQ_EQ, // ==
         BANG_EQ, // !=
         NUMBER,
+        IDENTIFIER,
         M_EOF
     };
 private:
@@ -35,14 +36,13 @@ private:
 public:
     Type type;
     double value;
-    char symbol;
+    std::string lexemme;
 
     [[nodiscard]] std::string toString() const;
     [[nodiscard]] static std::string typeToStr(Type aType);
     [[nodiscard]] std::string typeToStr() const;
     friend std::ostream& operator<<(std::ostream& os, const Token& obj);
-    Token(Type type, double  value = 0, char symbol = 0
-            );
+    Token(Type type, double  value = 0, std::string alexemme = "");
 
 };
 

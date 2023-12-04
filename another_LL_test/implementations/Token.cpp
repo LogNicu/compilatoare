@@ -2,6 +2,8 @@
 // Created by nicu on 12/2/23.
 //
 
+#include <utility>
+
 #include "../classes/Token.h"
 #define stringify(x) #x
 const std::unordered_map<Token::Type,std::string> Token::toStr = {
@@ -19,13 +21,14 @@ const std::unordered_map<Token::Type,std::string> Token::toStr = {
         {Token::EQ_EQ,       stringify(EQ_EQ)},
         {Token::BANG_EQ,       stringify(BANG_EQ)},
         {Token::NUMBER,   stringify(NUMBER)},
+        {Token::IDENTIFIER, stringify(IDENTIFIER)},
         {Token::M_EOF,    stringify(M_EOF)}
 };
 
 [[nodiscard]] std::string Token::toString() const {
     const Token &t = *this;
     return  std::string("{")+"\033[91m"+toStr.at(t.type)+"\033[0m, "+
-            std::to_string(t.value)+(t.type != NUMBER && t.type != M_EOF ? std::string(", '")+t.symbol+"'}": "}");
+            std::to_string(t.value)+(t.type != NUMBER && t.type != M_EOF ? std::string(", '")+t.lexemme+"'}": "}");
 }
 [[nodiscard]] std::string Token::typeToStr() const {
     return  toStr.at(this->type);
@@ -39,5 +42,5 @@ std::ostream& operator<<(std::ostream& os, const Token& obj) {
     return os;
 }
 
-Token::Token(Type type, double  value, char symbol) : type(type), value(value), symbol(symbol) {}
+Token::Token(Type type, double  value, std::string alexemme) : type(type), value(value), lexemme(alexemme) {}
 

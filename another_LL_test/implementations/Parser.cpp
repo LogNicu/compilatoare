@@ -15,10 +15,10 @@ Parser::Parser(std::string &s) :   current(0), lex(s){
         tokens.push_back(t);
         t = lex.next();
     }
-    tokens.push_back({Token::M_EOF,0,0});
+    tokens.push_back({Token::M_EOF});
 }
 static int st_counter = 0;
-#define DEBUG_INFO
+//#define DEBUG_INFO
 #define DEBUG_LEVEL2
 static void inline currentIndent() {
 #ifdef DEBUG_INFO
@@ -53,10 +53,12 @@ void Parser::expectType(Token t, Token::Type type) {
 }
 
 double Parser::parseExpr() {
+    debug();
     return parseEquality();
 }
 
 double Parser::parseEquality() {
+    debug();
     double val1 = parseComparison();
     while (match( {Token::EQ_EQ,Token::BANG_EQ})) {
         Token next = previous();
@@ -71,6 +73,7 @@ double Parser::parseEquality() {
 }
 
 double Parser::parseComparison() {
+    debug();
     double val1 = parseTerm();
     while (match( {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})) {
         Token next = previous();
@@ -91,6 +94,7 @@ double Parser::parseComparison() {
 }
 
 double Parser::parseTerm() {
+    debug();
     double val1 = parseFactor();
     while ( match( {Token::PLUS,Token::MINUS})) {
         Token next = previous();
@@ -105,6 +109,7 @@ double Parser::parseTerm() {
 }
 
 double Parser::parseFactor() {
+    debug();
     double val1 = parseUnary();
     while (match( {Token::STAR,Token::SLASH})) {
         Token next = previous();
@@ -119,6 +124,7 @@ double Parser::parseFactor() {
 }
 
 double Parser::parseUnary() {
+    debug();
     if(match({Token::BANG,Token::MINUS})) {
         Token tok = previous();
         double val = parseUnary();
@@ -129,7 +135,7 @@ double Parser::parseUnary() {
 }
 
 double Parser::parsePrimary() {
-
+    debug();
     if(match({Token::NUMBER})) {
         return previous().value;
     }else if(peek().type == Token::O_PAREN) {
@@ -138,6 +144,7 @@ double Parser::parsePrimary() {
         expectType(advance(),Token::C_PAREN);
         return value;
     }
+    throw std::runtime_error("Error: Unknown primary: "+peek().toString());
     return 0;
 }
 

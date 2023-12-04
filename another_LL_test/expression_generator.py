@@ -50,7 +50,6 @@ def main():
         pythonExpression = pattern.sub(replace_not, expression)
         value = eval(pythonExpression)
         value = round(value,5)
-
         # Specify the command as a list of arguments
         command = ["cmake-build-debug/another_LL_test", expression]
 

@@ -24,13 +24,22 @@ WHT [ \n\t\r]
 %%
 
 {WHT}	/* Skip whitespace */
+
+
+_*[a-zA-Z]+ {
+	Token tok = {Token::IDENTIFIER, 0 , std::string(yytext)};
+	emitToken(tok);
+}
+
+
 [0-9]+("."[0-9]+)?  {
-    emitToken({Token::NUMBER,  std::stod(yytext),0});/* parse a floating point number */
+    emitToken({Token::NUMBER, std::stod(yytext)});/* parse a floating point number */
     return Token::NUMBER;
 }
 [*+-/()!><]  {
-	emitToken({(Token::Type) *yytext, 0, *yytext}); /* parse punctuation and end-of-line characters */
-	return *yytext;
+
+	emitToken({(Token::Type) yytext[0], 0, std::string(yytext)}); /* parse punctuation and end-of-line characters */
+	return (Token::Type) yytext[0];
 }
 
 ">=" {emitToken({Token::GT_EQ}); return Token::GT_EQ;}
