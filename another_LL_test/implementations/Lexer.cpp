@@ -2,15 +2,11 @@
 // Created by nicu on 11/18/23.
 //
 
-
-#include "../flex/common_flex.h"
 #include "../classes/Lexer.h"
-#include "../classes/Token.h"
 #include <regex>
-
-
+#include <string>
 //#######################################################################################################
-
+extern Token getToken();
 Lexer::Lexer(std::string& code)
 {
     stream = new std::istringstream (code);

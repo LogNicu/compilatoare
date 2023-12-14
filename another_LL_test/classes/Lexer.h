@@ -8,8 +8,9 @@
 
 #include <string>
 #include <unordered_map>
-#include <FlexLexer.h>
+
 #include "../flex/common_flex.h"
+#include "../flex/flex_lexer.h"
 
 class Lexer{
     yyFlexLexer *l;

@@ -21,6 +21,7 @@ Token getToken() {
 }
 %}
 WHT [ \n\t\r]
+ANY_WHT {WHT}*
 %%
 
 {WHT}	/* Skip whitespace */
@@ -36,7 +37,7 @@ _*[a-zA-Z]+ {
     emitToken({Token::NUMBER, std::stod(yytext)});/* parse a floating point number */
     return Token::NUMBER;
 }
-[*+-/()!><]  {
+[*+-/()!><&|]  {
 
 	emitToken({(Token::Type) yytext[0], 0, std::string(yytext)}); /* parse punctuation and end-of-line characters */
 	return (Token::Type) yytext[0];
@@ -49,9 +50,13 @@ _*[a-zA-Z]+ {
 
 "==" {emitToken({Token::EQ_EQ}); return Token::EQ_EQ;}
 
+
 "!=" {emitToken({Token::BANG_EQ}); return Token::BANG_EQ;}
 
-"!" {emitToken({Token::BANG}); return Token::BANG;}
+
+"||" {emitToken({Token::LOGIC_OR}); return Token::LOGIC_OR;}
+
+"&&" {emitToken({Token::LOGIC_AND}); return Token::LOGIC_AND;}
 
 <<EOF>> {emitToken({Token::M_EOF}); return Token::M_EOF;};
 

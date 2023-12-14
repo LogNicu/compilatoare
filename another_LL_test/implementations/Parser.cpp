@@ -19,7 +19,6 @@ Parser::Parser(std::string &s) :   current(0), lex(s){
 }
 static int st_counter = 0;
 //#define DEBUG_INFO
-#define DEBUG_LEVEL2
 static void inline currentIndent() {
 #ifdef DEBUG_INFO
     for(int i = 0; i < st_counter;i++) std::cout<<"| ";
@@ -54,7 +53,12 @@ void Parser::expectType(Token t, Token::Type type) {
 
 Expression Parser::parseExpr() {
     debug();
-    return parseEquality();
+
+    Expression exp = parseEquality();
+    if (!isAtEnd()) {
+        expectType(peek(), Token::M_EOF);
+    }
+    return exp;
 }
 
 Expression Parser::parseEquality() {

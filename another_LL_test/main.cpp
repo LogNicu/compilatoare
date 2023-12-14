@@ -1,8 +1,5 @@
 #include <iostream>
-#include <regex>
-#include <unordered_map>
 #include <iomanip>
-#include "classes/Lexer.h"
 #include "classes/Parser.h"
 
 
@@ -15,7 +12,9 @@ int main(int argc, char *argv[]) {
         p.parseExpr().print(0);
         return 0;
     }
-
+    //TODO explore what happens when you pass unknown Tokens
+    //such as tokens that have been defined in lexer but have no rule in the parser
+    // a good candidate would be LOGIC_AND (in this version)
 //    line = "(((540+608)+(!974-!811))*((!703+626)+(140*80)))";
     while(std::getline(std::cin,line)) {
         Parser p(line);

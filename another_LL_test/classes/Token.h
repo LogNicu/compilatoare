@@ -21,12 +21,16 @@ public:
         BANG = '!',
         GT = '>',
         LT = '<',
+        AND = '&',
+        OR = '|',
         // If i am to assign ascii values to some enum values, the other ones should be
         // outside the ASCII range if i want to have safe automatic value assignment
         GT_EQ = 128, // >=
         LT_EQ, // <=
         EQ_EQ, // ==
         BANG_EQ, // !=
+        LOGIC_AND, // &&
+        LOGIC_OR, // ||
         NUMBER,
         IDENTIFIER,
         M_EOF
