@@ -49,5 +49,5 @@ std::ostream& operator<<(std::ostream& os, const Token& obj) {
     return os;
 }
 
-Token::Token(Type type, double  value, std::string alexemme) : type(type), value(value), lexemme(alexemme) {}
+Token::Token(Type type, double  value, std::string alexemme,unsigned long long lineNumber) : type(type), value(value), lexemme(alexemme), lineNumber(lineNumber) {}
 

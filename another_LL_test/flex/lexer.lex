@@ -13,6 +13,7 @@
 
 static std::vector<Token> globalVector;
 static int i = 0;
+static unsigned long long line_counter = 0 ;
 static void emitToken(Token t) {
     globalVector.push_back(t);
 }
@@ -20,21 +21,23 @@ Token getToken() {
     return globalVector[i++];
 }
 %}
-WHT [ \n\t\r]
+WHT [ \t\r]
 ANY_WHT {WHT}*
 %%
 
 {WHT}	/* Skip whitespace */
 
-
+\n {
+	line_counter++;
+}
 _*[a-zA-Z]+ {
-	Token tok = {Token::IDENTIFIER, 0 , std::string(yytext)};
+	Token tok = {Token::IDENTIFIER, 0 , std::string(yytext),line_counter};
 	emitToken(tok);
 }
 
 
 [0-9]+("."[0-9]+)?  {
-    emitToken({Token::NUMBER, std::stod(yytext)});/* parse a floating point number */
+    emitToken({Token::NUMBER, std::stod(yytext),"",line_counter});/* parse a floating point number */
     return Token::NUMBER;
 }
 [*+-/()!><&|^]  {
@@ -43,25 +46,25 @@ _*[a-zA-Z]+ {
 	return (Token::Type) yytext[0];
 }
 
-">=" {emitToken({Token::GT_EQ}); return Token::GT_EQ;}
+">=" {emitToken({Token::GT_EQ,0,">=",line_counter}); return Token::GT_EQ;}
 
-"<=" {emitToken({Token::LT_EQ}); return Token::LT_EQ;}
-
-
-"==" {emitToken({Token::EQ_EQ}); return Token::EQ_EQ;}
+"<=" {emitToken({Token::LT_EQ,0,"<=",line_counter}); return Token::LT_EQ;}
 
 
-"!=" {emitToken({Token::BANG_EQ}); return Token::BANG_EQ;}
+"==" {emitToken({Token::EQ_EQ,0,"==",line_counter}); return Token::EQ_EQ;}
 
 
-"||" {emitToken({Token::LOGIC_OR}); return Token::LOGIC_OR;}
+"!=" {emitToken({Token::BANG_EQ,0,"!=",line_counter}); return Token::BANG_EQ;}
 
-"&&" {emitToken({Token::LOGIC_AND}); return Token::LOGIC_AND;}
 
-"<<" {emitToken({Token::L_SHIFT}); return Token::L_SHIFT;}
-">>" {emitToken({Token::R_SHIFT}); return Token::R_SHIFT;}
+"||" {emitToken({Token::LOGIC_OR,0,"||",line_counter}); return Token::LOGIC_OR;}
 
-<<EOF>> {emitToken({Token::M_EOF}); return Token::M_EOF;};
+"&&" {emitToken({Token::LOGIC_AND,0,"&&",line_counter}); return Token::LOGIC_AND;}
+
+"<<" {emitToken({Token::L_SHIFT,0,"<<",line_counter}); return Token::L_SHIFT;}
+">>" {emitToken({Token::R_SHIFT,0,">>",line_counter}); return Token::R_SHIFT;}
+
+<<EOF>> {emitToken({Token::M_EOF,0,"END",line_counter}); return Token::M_EOF;};
 
 . {
 

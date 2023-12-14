@@ -15,7 +15,7 @@ Parser::Parser(std::string &s) :   current(0), lex(s){
         tokens.push_back(t);
         t = lex.next();
     }
-    tokens.push_back({Token::M_EOF,0,"END"});
+    tokens.push_back(t);
 }
 static int st_counter = 0;
 //#define DEBUG_INFO
@@ -176,7 +176,7 @@ Token Parser::peek() {
 }
 
 void Parser::error(Token token, std::string message) {
-    throw std::runtime_error("Error at '"+token.lexemme+"': "+message);
+    throw std::runtime_error("[line "+std::to_string(token.lineNumber)+"] Error at '"+token.lexemme+"': "+message);
 }
 
 

@@ -44,12 +44,13 @@ public:
     Type type;
     double value;
     std::string lexemme;
+    unsigned long long lineNumber;
 
     [[nodiscard]] std::string toString() const;
     [[nodiscard]] static std::string typeToStr(Type aType);
     [[nodiscard]] std::string typeToStr() const;
     friend std::ostream& operator<<(std::ostream& os, const Token& obj);
-    Token(Type type, double  value = 0, std::string alexemme = "");
+    Token(Type type, double  value = 0, std::string alexemme = "", unsigned long long lineNumber = 0);
 
 };
 
