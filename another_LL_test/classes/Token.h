@@ -23,6 +23,7 @@ public:
         LT = '<',
         AND = '&',
         OR = '|',
+        XOR = '^',
         // If i am to assign ascii values to some enum values, the other ones should be
         // outside the ASCII range if i want to have safe automatic value assignment
         GT_EQ = 128, // >=
@@ -31,6 +32,8 @@ public:
         BANG_EQ, // !=
         LOGIC_AND, // &&
         LOGIC_OR, // ||
+        L_SHIFT, // <<
+        R_SHIFT, // >>
         NUMBER,
         IDENTIFIER,
         M_EOF

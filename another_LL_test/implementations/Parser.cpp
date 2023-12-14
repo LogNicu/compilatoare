@@ -54,11 +54,72 @@ void Parser::expectType(Token t, Token::Type type) {
 Expression Parser::parseExpr() {
     debug();
 
-    Expression exp = parseEquality();
+    Expression exp = parseLogicOr();
     if (!isAtEnd()) {
         expectType(peek(), Token::M_EOF);
     }
     return exp;
+}
+
+Expression Parser::parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand) {
+    Expression left = (this->*operand)();
+    while (match(operators)) {
+        Token next = previous();
+        Expression right = (this->*operand)();
+        left = Expression(next, {left,right});
+    }
+    return left;
+}
+
+Expression Parser::parseLogicOr() {
+    debug();
+    Expression val1 = parseLogicAnd();
+    while (match( {Token::LOGIC_OR})) {
+        Token next = previous();
+        Expression right = parseLogicAnd();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
+}
+
+Expression Parser::parseLogicAnd() {
+    Expression val1 = parseBitOr();
+    while (match( {Token::LOGIC_AND})) {
+        Token next = previous();
+        Expression right = parseBitOr();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
+}
+Expression Parser::parseBitOr() {
+    debug();
+    Expression val1 = parseBitXor();
+    while (match( {Token::OR})) {
+        Token next = previous();
+        Expression right = parseBitXor();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
+}
+Expression Parser::parseBitXor() {
+    debug();
+    Expression val1 = parseBitAnd();
+    while (match( {Token::XOR})) {
+        Token next = previous();
+        Expression right = parseBitAnd();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
+}
+Expression Parser::parseBitAnd() {
+    debug();
+    Expression val1 = parseEquality();
+    while (match( {Token::AND})) {
+        Token next = previous();
+        Expression right = parseEquality();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
 }
 
 Expression Parser::parseEquality() {
@@ -74,8 +135,19 @@ Expression Parser::parseEquality() {
 
 Expression Parser::parseComparison() {
     debug();
-    Expression val1 = parseTerm();
+    Expression val1 = parseShift();
     while (match( {Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ})) {
+        Token next = previous();
+        Expression right = parseShift();
+        val1 = Expression(next,{val1,right});
+    }
+    return val1;
+}
+
+Expression Parser::parseShift() {
+    debug();
+    Expression val1 = parseTerm();
+    while (match( {Token::L_SHIFT,Token::R_SHIFT})) {
         Token next = previous();
         Expression right = parseTerm();
         val1 = Expression(next,{val1,right});
@@ -126,7 +198,7 @@ Expression Parser::parsePrimary() {
         expectType(advance(),Token::C_PAREN);
         return value;
     }
-    throw std::runtime_error("Error: Unknown primary: "+peek().toString());
+    throw std::runtime_error("Error-> Expected Expression after: "+previous().toString()+"\nInstead found: "+peek().toString());
 }
 
 

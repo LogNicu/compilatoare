@@ -8,6 +8,8 @@
 #include "Expression.h"
 
 class Parser {
+
+    typedef Expression (Parser::*parseBinaryFn)();
     Lexer lex;
     std::vector<Token> tokens;
     int current;
@@ -15,17 +17,25 @@ class Parser {
     Token advance();
     Token peek();
     Token previous();
+    Expression parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand);
 public:
     Parser(std::string &s);
     Expression parseExpr();
+    Expression parseLogicOr();
+    Expression parseLogicAnd();
+    Expression parseBitOr();
+    Expression parseBitXor();
+    Expression parseBitAnd();
     Expression parseEquality();
     Expression parseComparison();
+    Expression parseShift();
     Expression parseTerm();
     Expression parseFactor();
     Expression parsePrimary();
     Expression parseUnary();
     void expectType(Token t, Token::Type type);
     bool match(const std::vector<Token::Type>& types);
+
 };
 
 #endif //CPP_COMPILER_PARSER_H

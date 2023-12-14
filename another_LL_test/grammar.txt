@@ -1,6 +1,12 @@
 expr: equality
+logic_or: logic_and ( "||" logic_and )*
+logic_and: bit_or ( "&&" bit_or )*
+bit_or: bit_xor ( "|" bit_xor)*
+bit_xor: bit_and ( "^" bit_and )*
+bit_and:  equality ( "&" equality )*
 equality: comparisom (("==" | "!=" ) comparison)*
-comparison: term ( ( ">" |  "<" | "<=" | ">="  ) term )* ; //TODO rust doesn't seem to support chaining such as 6>3>1
+comparison: shift ( ( ">" |  "<" | "<=" | ">="  ) shift )* ; //TODO rust doesn't seem to support chaining such as 6>3>1
+shift: term ( ("<<" | ">>") term)*
 term: factor ( '+' | '-' factor)*
 factor: unary ('*' | '/' unary)*
 unary          → ( "!" | "-" ) unary
