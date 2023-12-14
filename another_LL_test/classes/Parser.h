@@ -18,6 +18,7 @@ class Parser {
     Token peek();
     Token previous();
     Expression parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand);
+    void error(Token token, std::string message);
 public:
     Parser(std::string &s);
     Expression parseExpr();
