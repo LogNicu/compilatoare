@@ -8,6 +8,10 @@
 #include <sstream>
 #include "../classes/Parser.h"
 #include "unordered_set"
+#include "../classes/ExprBinary.h"
+#include "../classes/ExprUnary.h"
+#include "../classes/ExprLiteral.h"
+
 #define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){
     Token t=lex.next();
@@ -51,92 +55,92 @@ void Parser::expectType(Token t, Token::Type type) {
     }
 }
 
-Expression Parser::parseExpr() {
+Expression *Parser::parseExpr() {
     debug();
 
-    Expression exp = parseLogicOr();
+    Expression* exp = parseLogicOr();
     if (!isAtEnd()) {
         expectType(peek(), Token::M_EOF);
     }
     return exp;
 }
 
-Expression Parser::parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand) {
-    Expression left = (this->*operand)();
+Expression* Parser::parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand) {
+    Expression* left = (this->*operand)();
     while (match(operators)) {
         Token next = previous();
-        Expression right = (this->*operand)();
-        left = Expression(next, {left,right});
+        Expression* right = (this->*operand)();
+        left = new ExprBinary(next, left,right);
     }
     return left;
 }
 
-Expression Parser::parseLogicOr() {
+Expression* Parser::parseLogicOr() {
     debug();
     return parseBinaryExpr({Token::LOGIC_OR}, &Parser::parseLogicAnd);
 }
 
-Expression Parser::parseLogicAnd() {
+Expression* Parser::parseLogicAnd() {
     debug();
     return parseBinaryExpr({Token::LOGIC_AND}, &Parser::parseBitOr);
 }
-Expression Parser::parseBitOr() {
+Expression* Parser::parseBitOr() {
     debug();
     return parseBinaryExpr({Token::OR}, &Parser::parseBitXor);
 }
-Expression Parser::parseBitXor() {
+Expression* Parser::parseBitXor() {
     debug();
     return parseBinaryExpr({Token::XOR}, &Parser::parseBitAnd);
 }
-Expression Parser::parseBitAnd() {
+Expression* Parser::parseBitAnd() {
     debug();
     return parseBinaryExpr({Token::AND}, &Parser::parseEquality);
 }
 
-Expression Parser::parseEquality() {
+Expression* Parser::parseEquality() {
     debug();
     return parseBinaryExpr({Token::EQ_EQ,Token::BANG_EQ}, &Parser::parseComparison);
 }
 
-Expression Parser::parseComparison() {
+Expression* Parser::parseComparison() {
     debug();
     return parseBinaryExpr({Token::GT,Token::LT,Token::GT_EQ,Token::LT_EQ},
                            &Parser::parseShift);
 }
 
-Expression Parser::parseShift() {
+Expression* Parser::parseShift() {
     debug();
     return parseBinaryExpr({Token::L_SHIFT,Token::R_SHIFT}, &Parser::parseTerm);
 }
 
-Expression Parser::parseTerm() {
+Expression* Parser::parseTerm() {
     debug();
     return parseBinaryExpr({Token::PLUS,Token::MINUS}, &Parser::parseFactor);
 }
 
-Expression Parser::parseFactor() {
+Expression* Parser::parseFactor() {
     debug();
     return parseBinaryExpr({Token::STAR,Token::SLASH}, &Parser::parseUnary);
 }
 
-Expression Parser::parseUnary() {
+Expression* Parser::parseUnary() {
     debug();
     if(match({Token::BANG,Token::MINUS})) {
         Token tok = previous();
-        Expression val = parseUnary();
-        return Expression(tok,{val});
+        Expression *val = parseUnary();
+        return new ExprUnary(tok,val);
     }else{
         return parsePrimary();
     }
 }
 
-Expression Parser::parsePrimary() {
+Expression* Parser::parsePrimary() {
     debug();
     if(match({Token::NUMBER})) {
-        return Expression(previous());
+        return  new ExprLiteral(previous());
     }else if(peek().type == Token::O_PAREN) {
         advance();
-        Expression value = parseExpr();
+        Expression* value = parseExpr();
         expectType(advance(),Token::C_PAREN);
         return value;
     }

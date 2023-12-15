@@ -10,12 +10,9 @@
 #include "Token.h"
 
 class Expression {
-    Token tok;
-    std::vector<Expression> operands;
 public:
-    Expression(Token tok);
-    Expression(Token tok, std::vector<Expression> operands);
-    void print(int level);
+    virtual void print(int level = 0) = 0;
+    virtual ~Expression() {};
 };
 
 
