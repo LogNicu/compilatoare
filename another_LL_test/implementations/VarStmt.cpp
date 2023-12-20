@@ -10,7 +10,7 @@ VarStmt::VarStmt(Token varName, Token varType, Expression *initializer) : varNam
 
 void VarStmt::print(int level) {
     std::cout<<varName.lexemme<<" of type "<< varType.lexemme<<" -> Has expression:\n";
-    initializer->print(2);
+    initializer->print(level+1);
 }
 
 VarStmt::~VarStmt() {

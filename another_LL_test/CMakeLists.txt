@@ -39,6 +39,10 @@ add_executable(another_LL_test main.cpp
         implementations/VarStmt.cpp
         classes/VarStmt.h
         implementations/ExprStmt.cpp
-        classes/ExprStmt.h)
+        classes/ExprStmt.h
+        implementations/ExprCall.cpp
+        classes/ExprCall.h
+        implementations/ExprVar.cpp
+        classes/ExprVar.h)
 
 add_dependencies(another_LL_test lexer_target)

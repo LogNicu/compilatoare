@@ -13,6 +13,9 @@
 #include "../classes/ExprLiteral.h"
 #include "../classes/VarStmt.h"
 #include "../classes/ExprStmt.h"
+#include "../classes/ExprCall.h"
+#include "../classes/ExprVar.h"
+
 #define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){
     Token t=lex.next();
@@ -167,7 +170,22 @@ Expression* Parser::parseUnary() {
         Expression *val = parseUnary();
         return new ExprUnary(tok,val);
     }else{
-        return parsePrimary();
+        return parseCall();
+    }
+}
+
+Expression *Parser::parseCall() {
+    debug();
+    Expression* expr = parsePrimary();
+    if(match({Token::O_PAREN})) {
+        std::vector<Expression*> arguments;
+        do {
+            arguments.push_back(parseExpr());
+        } while (match({Token::COMMA}));
+        consume(Token::C_PAREN,"Expected closed paren after function call start");
+        return new ExprCall(expr, arguments);
+    }else {
+        return expr;
     }
 }
 
@@ -180,6 +198,8 @@ Expression* Parser::parsePrimary() {
         Expression* value = parseExpr();
         expectType(advance(),Token::C_PAREN);
         return value;
+    }else if(match({Token::IDENTIFIER})) {
+        return new ExprVar(previous());
     }
     error(peek(),"Expected expression");
 }
@@ -227,6 +247,8 @@ Token Parser::consume(Token::Type type, std::string message) {
 
     error(peek(), message);
 }
+
+
 
 
 

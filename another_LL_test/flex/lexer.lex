@@ -48,7 +48,7 @@ _*[a-zA-Z]+ {
     emitToken({Token::NUMBER, std::stod(yytext),std::string(yytext),line_counter});/* parse a floating point number */
     return Token::NUMBER;
 }
-[*+-/()!><&|^;=]  {
+[*+-/()!><&|^;=,]  {
 
 	emitToken({(Token::Type) yytext[0], 0, std::string(yytext)}); 
 	return (Token::Type) yytext[0];

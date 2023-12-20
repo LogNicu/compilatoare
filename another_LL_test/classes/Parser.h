@@ -41,8 +41,9 @@ public:
     Expression *parseShift();
     Expression *parseTerm();
     Expression *parseFactor();
-    Expression *parsePrimary();
     Expression *parseUnary();
+    Expression *parseCall();
+    Expression *parsePrimary();
     void expectType(Token t, Token::Type type);
     bool match(const std::vector<Token::Type>& types);
 

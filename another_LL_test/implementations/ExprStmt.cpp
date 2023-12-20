@@ -7,7 +7,7 @@
 ExprStmt::ExprStmt(Expression *expr) : expr(expr) {}
 
 void ExprStmt::print(int level) {
-    this->expr->print();
+    this->expr->print(level);
 }
 
 ExprStmt::~ExprStmt() {
