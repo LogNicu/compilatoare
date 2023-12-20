@@ -17,10 +17,18 @@ class Parser {
     Token advance();
     Token peek();
     Token previous();
+    Token consume(Token::Type type, std::string message="");
     Expression* parseBinaryExpr(std::vector<Token::Type> operators, parseBinaryFn operand);
     void error(Token token, std::string message);
 public:
     Parser(std::string &s);
+
+    //Statements
+    void parse();
+    void statement();
+    void exprStatement();
+    void varDecl();
+    ///Expressions
     Expression *parseExpr();
     Expression *parseLogicOr();
     Expression *parseLogicAnd();

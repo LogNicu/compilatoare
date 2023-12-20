@@ -7,9 +7,10 @@ paramas: IDENTIFIER ":" dataType ("," IDENTIFIER ":" dataType)*
 block: "{" statement* "}"
 statement: exprStatement | varDecl
 exprStatement: expr ";"
-varDecl: "let" IDENTIFIER (":" dataType)? "=" expr ";"
+varDecl: "let" IDENTIFIER (":" dataType)? ("=" expr)? ";" // for now keep data type and assignment mandatory
 
-
+dataType: primitiveType | array_type
+arrayType: "[" primitiveType ";" "]" //DO LATER, FOCUS ON PRIMITIVE
 
 ///////Expressions
 expr: equality

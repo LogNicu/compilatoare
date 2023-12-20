@@ -51,17 +51,51 @@ static inline  void debug2() {
 }
 void Parser::expectType(Token t, Token::Type type) {
     if(t.type != type) {
-        error(t,"Unexpected token");
+        error(t,"Unexpected token. Expected token of type: "+Token::typeToStr(type));
     }
+}
+
+void Parser::parse() {
+    debug();
+    while (!isAtEnd()) {
+        statement();
+    }
+}
+
+void Parser::statement() {
+    debug();
+    if (match({Token::LET})) {
+        varDecl();
+    }else{
+        exprStatement();
+    }
+}
+
+void Parser::varDecl() {
+    debug();
+    Token name = consume(Token::IDENTIFIER, "Expected an identifier");
+    expectType(advance(), Token::COLON);
+    Token type = consume(Token::DATA_TYPE, "Expected a data type");
+
+    expectType(advance(), Token::EQUAL);
+    Expression *expr = parseExpr();
+    expectType(advance(), Token::SEMICOL);
+    std::cout<<name.lexemme<<" of type "<< type.lexemme<<" -> Has expression:\n";
+    expr->print(8);
+
+
+}
+
+void Parser::exprStatement() {
+    debug();
+    Expression* expr = parseExpr();
+    expectType(advance(), Token::SEMICOL);
+    expr->print();
 }
 
 Expression *Parser::parseExpr() {
     debug();
-
     Expression* exp = parseLogicOr();
-    if (!isAtEnd()) {
-        expectType(peek(), Token::M_EOF);
-    }
     return exp;
 }
 
@@ -182,6 +216,19 @@ Token Parser::peek() {
 void Parser::error(Token token, std::string message) {
     throw std::runtime_error("[line "+std::to_string(token.lineNumber)+"] Error at '"+token.lexemme+"': "+message);
 }
+
+Token Parser::consume(Token::Type type, std::string message) {
+    if (peek().type == type) {
+        return advance();
+    }
+
+    error(peek(), message);
+}
+
+
+
+
+
 
 
 
