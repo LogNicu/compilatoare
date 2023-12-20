@@ -6,6 +6,7 @@
 #define CPP_COMPILER_PARSER_H
 #include "Lexer.h"
 #include "Expression.h"
+#include "Statement.h"
 
 class Parser {
 
@@ -25,9 +26,9 @@ public:
 
     //Statements
     void parse();
-    void statement();
-    void exprStatement();
-    void varDecl();
+    Statement* statement();
+    Statement* exprStatement();
+    Statement* varDecl();
     ///Expressions
     Expression *parseExpr();
     Expression *parseLogicOr();

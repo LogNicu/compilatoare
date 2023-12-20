@@ -11,7 +11,8 @@
 #include "../classes/ExprBinary.h"
 #include "../classes/ExprUnary.h"
 #include "../classes/ExprLiteral.h"
-
+#include "../classes/VarStmt.h"
+#include "../classes/ExprStmt.h"
 #define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){
     Token t=lex.next();
@@ -58,39 +59,41 @@ void Parser::expectType(Token t, Token::Type type) {
 void Parser::parse() {
     debug();
     while (!isAtEnd()) {
-        statement();
+        Statement *smt = statement();
+        smt->print();
+        delete smt;
     }
 }
 
-void Parser::statement() {
+Statement* Parser::statement() {
     debug();
+    Statement* stmt;
     if (match({Token::LET})) {
-        varDecl();
+        stmt = varDecl();
     }else{
-        exprStatement();
+        stmt = exprStatement();
     }
+    return stmt;
 }
 
-void Parser::varDecl() {
+Statement* Parser::varDecl() {
     debug();
     Token name = consume(Token::IDENTIFIER, "Expected an identifier");
     expectType(advance(), Token::COLON);
     Token type = consume(Token::DATA_TYPE, "Expected a data type");
-
     expectType(advance(), Token::EQUAL);
     Expression *expr = parseExpr();
     expectType(advance(), Token::SEMICOL);
-    std::cout<<name.lexemme<<" of type "<< type.lexemme<<" -> Has expression:\n";
-    expr->print(8);
+    return new VarStmt(name,type, expr);
 
 
 }
 
-void Parser::exprStatement() {
+Statement* Parser::exprStatement() {
     debug();
     Expression* expr = parseExpr();
     expectType(advance(), Token::SEMICOL);
-    expr->print();
+    return new ExprStmt(expr);
 }
 
 Expression *Parser::parseExpr() {

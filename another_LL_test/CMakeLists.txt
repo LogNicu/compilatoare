@@ -33,6 +33,12 @@ add_executable(another_LL_test main.cpp
         implementations/ExprUnary.cpp
         classes/ExprUnary.h
         implementations/ExprLiteral.cpp
-        classes/ExprLiteral.h)
+        classes/ExprLiteral.h
+        implementations/Statement.cpp
+        classes/Statement.h
+        implementations/VarStmt.cpp
+        classes/VarStmt.h
+        implementations/ExprStmt.cpp
+        classes/ExprStmt.h)
 
 add_dependencies(another_LL_test lexer_target)
