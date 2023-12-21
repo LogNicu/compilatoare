@@ -9,10 +9,10 @@
 #include "Expression.h"
 
 class ExprBinary: public Expression{
+public:
     Expression* left;
     Expression* right;
     Token tokOperator;
-public:
     ExprBinary(Token tokOperator, Expression* left, Expression* right);
     void print(int level = 0) override;
     ~ExprBinary() override;

@@ -10,8 +10,8 @@
 #include "Expression.h"
 
 class ExprLiteral: public Expression {
-    Token tokLiteral;
 public:
+    Token tokLiteral;
     ExprLiteral(Token tokOperator);
     void print(int level = 0) override;
     ~ExprLiteral() override;

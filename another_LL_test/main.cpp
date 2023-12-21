@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <fstream>
 #include "frontend/classes/Parser.h"
+#include "backend/classes/Generator.h"
+#include "frontend/classes/statements/ExprStmt.h"
 
 
 int main(int argc, char *argv[]) {
@@ -9,22 +11,23 @@ int main(int argc, char *argv[]) {
     if(argc > 1) {
         line = std::string (argv[1]);
         Parser p(line);
-        Expression *exp = p.parseExpr();
-        exp->print();
-        delete exp;
+        p.parse();
         return 0;
     }
-
-//    while(std::getline(std::cin,line)) {
-//        Parser p(line);
-//        p.parse();
-//    }
-    std::string filepath = "/home/nicu/Projects/compilatoare/another_LL_test/code.rs";
-
-    // Open the file
-    std::ifstream file(filepath);
+    //TODO what is this: 1-2!2
+    while(std::getline(std::cin,line)) {
+        Parser p(line);
+        auto* statement = dynamic_cast<ExprStmt *>(p.exprStatement());
+        auto [code, regno_discard_me] = Generator::generate(statement->expr);
+        std::cout<< code;
+    }
+//    std::string filepath = "/home/nicu/Projects/compilatoare/another_LL_test/code.rs";
+//
+//    // Open the file
+//    std::ifstream file(filepath);
 
     // Check if the file is open
+    /*
     if (file.is_open()) {
         // Use a stringstream to read the file content into a string
         std::stringstream buffer;
@@ -40,6 +43,7 @@ int main(int argc, char *argv[]) {
     } else {
         std::cerr << "Unable to open the file: " << filepath << std::endl;
     }
+     */
 
     return 0;
 }

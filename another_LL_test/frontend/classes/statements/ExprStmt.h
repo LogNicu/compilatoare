@@ -10,8 +10,8 @@
 #include "../expressions/Expression.h"
 
 class ExprStmt : public Statement{
-    Expression* expr;
 public:
+    Expression* expr;
     ExprStmt(Expression* expr);
     void print(int level = 0) override;
     ~ExprStmt() override;

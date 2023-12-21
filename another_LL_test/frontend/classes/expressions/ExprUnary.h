@@ -9,9 +9,9 @@
 #include "Expression.h"
 
 class ExprUnary : public  Expression{
+public:
     Expression* right;
     Token tokOperator;
-public:
     ExprUnary(Token tokOperator, Expression* right);
     void print(int level = 0) override;
     ~ExprUnary() override;

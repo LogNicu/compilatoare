@@ -43,6 +43,8 @@ add_executable(another_LL_test main.cpp
         frontend/implementations/expressions/ExprCall.cpp
         frontend/classes/expressions/ExprCall.h
         frontend/implementations/expressions/ExprVar.cpp
-        frontend/classes/expressions/ExprVar.h)
+        frontend/classes/expressions/ExprVar.h
+        backend/implementations/Generator.cpp
+        backend/classes/Generator.h)
 
 add_dependencies(another_LL_test lexer_target)

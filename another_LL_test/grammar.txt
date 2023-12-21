@@ -26,6 +26,5 @@ term: factor ( '+' | '-' factor)*
 factor: unary ('*' | '/' unary)*
 unary: ( "!" | "-" ) unary
        | primary ;
-call:  primary "(" arguments? ")";
-arguments: expr ( "," expr )* ;
+call:  primary "(" arguments? ")";    ----------- arguments: expr ( "," expr )* ;
 primary: NUMBER | '(' expr ')'
