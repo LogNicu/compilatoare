@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../classes/VarStmt.h"
+#include "../../classes/statements/VarStmt.h"
 
 VarStmt::VarStmt(Token varName, Token varType, Expression *initializer) : varName(varName), varType(varType), initializer(initializer)  {}
 

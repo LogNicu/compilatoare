@@ -6,7 +6,7 @@
 #define ANOTHER_LL_TEST_EXPRLITERAL_H
 
 
-#include "Token.h"
+#include "../Token.h"
 #include "Expression.h"
 
 class ExprLiteral: public Expression {

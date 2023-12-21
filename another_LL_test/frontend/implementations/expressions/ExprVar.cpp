@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../classes/ExprVar.h"
+#include "../../classes/expressions/ExprVar.h"
 
 ExprVar::ExprVar(Token varName) : varName(varName){}
 

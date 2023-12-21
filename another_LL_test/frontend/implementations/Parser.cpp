@@ -8,13 +8,13 @@
 #include <sstream>
 #include "../classes/Parser.h"
 #include "unordered_set"
-#include "../classes/ExprBinary.h"
-#include "../classes/ExprUnary.h"
-#include "../classes/ExprLiteral.h"
-#include "../classes/VarStmt.h"
-#include "../classes/ExprStmt.h"
-#include "../classes/ExprCall.h"
-#include "../classes/ExprVar.h"
+#include "../classes/expressions/ExprBinary.h"
+#include "../classes/expressions/ExprUnary.h"
+#include "../classes/expressions/ExprLiteral.h"
+#include "../classes/statements/VarStmt.h"
+#include "../classes/statements/ExprStmt.h"
+#include "../classes/expressions/ExprCall.h"
+#include "../classes/expressions/ExprVar.h"
 
 #define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){

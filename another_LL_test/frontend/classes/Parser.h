@@ -5,8 +5,8 @@
 #ifndef CPP_COMPILER_PARSER_H
 #define CPP_COMPILER_PARSER_H
 #include "Lexer.h"
-#include "Expression.h"
-#include "Statement.h"
+#include "expressions/Expression.h"
+#include "statements/Statement.h"
 
 class Parser {
 

@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../classes/ExprLiteral.h"
+#include "../../classes/expressions/ExprLiteral.h"
 
 ExprLiteral::ExprLiteral(Token tokLiteral) : tokLiteral(tokLiteral){}
 

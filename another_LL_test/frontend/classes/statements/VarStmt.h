@@ -7,7 +7,7 @@
 
 
 #include "Statement.h"
-#include "Expression.h"
+#include "../expressions/Expression.h"
 
 class VarStmt : public Statement{
     Token varName;

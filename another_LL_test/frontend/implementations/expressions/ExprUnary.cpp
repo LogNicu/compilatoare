@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../classes/ExprUnary.h"
+#include "../../classes/expressions/ExprUnary.h"
 
 ExprUnary::ExprUnary(Token tokOperator, Expression *right) : tokOperator(tokOperator), right(right) {}
 

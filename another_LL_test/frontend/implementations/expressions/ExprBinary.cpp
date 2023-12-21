@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../classes/ExprBinary.h"
+#include "../../classes/expressions/ExprBinary.h"
 
 ExprBinary::ExprBinary(Token tokOperator, Expression *left, Expression *right) :tokOperator(tokOperator), left(left), right(right) {}
 
