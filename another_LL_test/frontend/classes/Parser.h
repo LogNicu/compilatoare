@@ -29,6 +29,7 @@ public:
     Statement* statement();
     Statement* exprStatement();
     Statement* varDecl();
+    Statement* funStmt();
     ///Expressions
     Expression *parseExpr();
     Expression *parseLogicOr();

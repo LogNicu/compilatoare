@@ -45,6 +45,8 @@ add_executable(another_LL_test main.cpp
         frontend/implementations/expressions/ExprVar.cpp
         frontend/classes/expressions/ExprVar.h
         backend/implementations/Generator.cpp
-        backend/classes/Generator.h)
+        backend/classes/Generator.h
+        frontend/implementations/statements/FunDecl.cpp
+        frontend/classes/statements/FunDecl.h)
 
 add_dependencies(another_LL_test lexer_target)

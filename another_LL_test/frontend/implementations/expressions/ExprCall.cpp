@@ -12,7 +12,7 @@ void ExprCall::print(int level) {
     for(int i = 0; i < level*spaces; i++) {
         std::cout<<' ';
     }
-    std::cout<<"function ";
+    std::cout<<"call ";
     funName->print(level);
     for (Expression* expr: this->arguments) {
         expr->print(level+1);

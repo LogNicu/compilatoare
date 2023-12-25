@@ -33,6 +33,7 @@ ANY_WHT {WHT}*
 	line_counter++;
 }
 
+"fn" {emitToken({Token::FN,0,"fn",line_counter}); return Token::FN;}
 
 "let" { //let has to be put before identifier so identifier doesn't match first
 	emitToken({Token::LET,0,"let",line_counter}); return Token::R_SHIFT;
@@ -48,11 +49,12 @@ _*[a-zA-Z]+ {
     emitToken({Token::NUMBER, std::stod(yytext),std::string(yytext),line_counter});/* parse a floating point number */
     return Token::NUMBER;
 }
-[*+-/()!><&|^;=,]  {
+[*+-/()!><&|^;=,{}]  {
 
 	emitToken({(Token::Type) yytext[0], 0, std::string(yytext)}); 
 	return (Token::Type) yytext[0];
 }
+
 
 ">=" {emitToken({Token::GT_EQ,0,">=",line_counter}); return Token::GT_EQ;}
 

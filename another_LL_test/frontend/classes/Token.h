@@ -28,6 +28,8 @@ public:
         SEMICOL = ';',
         EQUAL = '=',
         COMMA = ',',
+        O_ACCOL = '{',
+        C_ACCOL = '}',
         // If i am to assign ascii values to some enum values, the other ones should be
         // outside the ASCII range if i want to have safe automatic value assignment
         GT_EQ = 128, // >=
@@ -39,6 +41,7 @@ public:
         L_SHIFT, // <<
         R_SHIFT, // >>
         ARROW, // ->
+        FN, // fn
         DATA_TYPE,
         NUMBER,
         IDENTIFIER,

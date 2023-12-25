@@ -15,6 +15,7 @@
 #include "../classes/statements/ExprStmt.h"
 #include "../classes/expressions/ExprCall.h"
 #include "../classes/expressions/ExprVar.h"
+#include "../classes/statements/FunDecl.h"
 
 #define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){
@@ -73,6 +74,8 @@ Statement* Parser::statement() {
     Statement* stmt;
     if (match({Token::LET})) {
         stmt = varDecl();
+    }else if(match({Token::FN})) {
+        stmt = funStmt();
     }else{
         stmt = exprStatement();
     }
@@ -90,6 +93,38 @@ Statement* Parser::varDecl() {
     return new VarStmt(name,type, expr);
 
 
+}
+
+Statement *Parser::funStmt() {
+    debug();
+    Token funName = consume(Token::IDENTIFIER, "Expected an identifier");
+    consume(Token::O_PAREN, "Expected open paren after fn");
+    std::vector<std::pair<Token, Token>> params;
+    while (!match({Token::C_PAREN})) {
+        Token name = consume(Token::IDENTIFIER, "Expected an identifier");
+        consume(Token::COLON, "Expected : after param name");
+        Token type = consume(Token::DATA_TYPE, "Expected a data type");
+        if(peek().type != Token::C_PAREN) {
+            consume(Token::COMMA, "Expected comma after param");
+        }
+        params.push_back(std::pair<Token,Token>{name, type});
+    }
+    Token returnType = Token(Token::DATA_TYPE,0,"void"); //TODO create vod data type;
+    if(match({Token::ARROW})) {
+        returnType = advance();
+    }
+    consume(Token::O_ACCOL, "Expected accolade before function body");
+
+    std::vector<Statement*> statements;
+    while (!match({Token::C_ACCOL})) {
+        statements.push_back(statement());
+    }
+    return new FunDecl(funName, returnType, params, statements);
+//    consume(Token::O_ACCOL, "Expected accolade after function body");
+
+
+
+    return nullptr;
 }
 
 Statement* Parser::exprStatement() {
@@ -247,6 +282,7 @@ Token Parser::consume(Token::Type type, std::string message) {
 
     error(peek(), message);
 }
+
 
 
 
