@@ -47,6 +47,8 @@ add_executable(another_LL_test main.cpp
         backend/implementations/Generator.cpp
         backend/classes/Generator.h
         frontend/implementations/statements/FunDecl.cpp
-        frontend/classes/statements/FunDecl.h)
+        frontend/classes/statements/FunDecl.h
+        backend/instructions/implementations/Instruction.cpp
+        backend/instructions/classes/Instruction.h)
 
 add_dependencies(another_LL_test lexer_target)

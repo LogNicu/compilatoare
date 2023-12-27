@@ -17,7 +17,6 @@
 #include "../classes/expressions/ExprVar.h"
 #include "../classes/statements/FunDecl.h"
 
-#define in(X,...) std::unordered_set<Token::Type>{ __VA_ARGS__ }.contains(X)
 Parser::Parser(std::string &s) :   current(0), lex(s){
     Token t=lex.next();
     while(t.type != Token::M_EOF) {

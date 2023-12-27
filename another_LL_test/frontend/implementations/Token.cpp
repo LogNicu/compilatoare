@@ -25,6 +25,7 @@ const std::unordered_map<Token::Type,std::string> Token::toStr = {
         {COMMA, stringify(COMMA)},
         {O_ACCOL, stringify(O_ACCOL)},
         {C_ACCOL, stringify(C_ACCOL)},
+        {UNARY_NEG, stringify(UNARY_NEG)},
         {GT_EQ,       stringify(GT_EQ)},
         {LT_EQ,       stringify(LT_EQ)},
         {EQ_EQ,       stringify(EQ_EQ)},

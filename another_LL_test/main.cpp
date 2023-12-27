@@ -4,7 +4,7 @@
 #include "frontend/classes/Parser.h"
 #include "backend/classes/Generator.h"
 #include "frontend/classes/statements/ExprStmt.h"
-
+#include "backend/instructions/classes/Instruction.h"
 
 int main(int argc, char *argv[]) {
     std::string line;
@@ -16,12 +16,19 @@ int main(int argc, char *argv[]) {
     }
 
 
-//    while(std::getline(std::cin,line)) {
-//        Parser p(line);
-//        auto* statement = dynamic_cast<ExprStmt *>(p.exprStatement());
-//        auto [code, regno_discard_me] = Generator::generate(statement->expr);
-//        std::cout<< code;
-//    }
+    while(std::getline(std::cin,line)) {
+        Parser p(line);
+        auto* statement = dynamic_cast<ExprStmt *>(p.exprStatement());
+        auto regno_discard_me = Generator::generate(statement->expr);
+        for(auto inst: Generator::instructionList) {
+            std::cout<<"\t"<<InstructionTypeToString(inst.instr)<<" ";
+            for (auto op: inst.operands) {
+                std::cout<<"["<<OperandTypeToString(op.type)<<"]"<<op.op<<" ";
+            }
+            std::cout<<"\n";
+        }
+    }
+/*
     std::string filepath = "/home/nicu/Projects/compilatoare/another_LL_test/code.rs";
 
     // Open the file
@@ -45,6 +52,6 @@ int main(int argc, char *argv[]) {
         std::cerr << "Unable to open the file: " << filepath << std::endl;
     }
 
-
+*/
     return 0;
 }

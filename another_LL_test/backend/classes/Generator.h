@@ -8,11 +8,13 @@
 
 #include <string>
 #include "../../frontend/classes/expressions/Expression.h"
+#include "../instructions/classes/Instruction.h"
 
 class Generator {
     static int regno;
 public:
-    static std::tuple<std::string, int> generate(Expression* expr);
+    static std::vector<Instruction> instructionList;
+    static int generate(Expression* expr);
 };
 
 
