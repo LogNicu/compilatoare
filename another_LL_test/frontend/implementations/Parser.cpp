@@ -16,6 +16,7 @@
 #include "../classes/expressions/ExprCall.h"
 #include "../classes/expressions/ExprVar.h"
 #include "../classes/statements/FunDecl.h"
+#include "../classes/statements/ReturnStmt.h"
 
 Parser::Parser(std::string &s) :   current(0), lex(s){
     Token t=lex.next();
@@ -32,7 +33,7 @@ static void inline currentIndent() {
     for(int i = 0; i < st_counter;i++) std::cout<<"| ";
 #endif
 }
-//TODO not working:   ((142+!197)-(302*!630))
+
 static inline void debug1(std::string s) {
 #ifdef DEBUG_INFO
     currentIndent();
@@ -71,59 +72,71 @@ void Parser::parse() {
 Statement* Parser::statement() {
     debug();
     Statement* stmt;
-    if (match({Token::LET})) {
-        stmt = varDecl();
-    }else if(match({Token::FN})) {
-        stmt = funStmt();
-    }else{
+    if(match({Token::RETURN})) {
+        stmt = returnStatement();
+    }else if (match({Token::IDENTIFIER})) {
+        Token dataType = previous();
+        if(match({Token::IDENTIFIER})) {
+            Token identifier = previous();
+            if (peek().type == Token::O_PAREN) {
+                stmt = funStmt(dataType, identifier);
+            } else if (peek().type == Token::EQUAL || peek().type == Token::SEMICOL) {
+                stmt = varDecl(dataType, identifier);
+            } else {
+                error(peek(), "Unexpected token after data type");
+            }
+        }else {
+            current--;
+            //TODO: "UNCONSUME" the IDENTIFIER, this looks  really bad and should find a better solution
+            stmt = exprStatement();
+        }
+    }else {
         stmt = exprStatement();
     }
     return stmt;
 }
 
-Statement* Parser::varDecl() {
+Statement* Parser::varDecl(Token dataType, Token identifier) {
     debug();
-    Token name = consume(Token::IDENTIFIER, "Expected an identifier");
-    expectType(advance(), Token::COLON);
-    Token type = consume(Token::DATA_TYPE, "Expected a data type");
+
     expectType(advance(), Token::EQUAL);
     Expression *expr = parseExpr();
     expectType(advance(), Token::SEMICOL);
-    return new VarStmt(name,type, expr);
+    return new VarStmt(dataType, identifier, expr);
 
 
 }
 
-Statement *Parser::funStmt() {
+Statement *Parser::funStmt(Token returnType, Token identifier) {
     debug();
-    Token funName = consume(Token::IDENTIFIER, "Expected an identifier");
     consume(Token::O_PAREN, "Expected open paren after fn");
     std::vector<std::pair<Token, Token>> params;
     while (!match({Token::C_PAREN})) {
+        Token type = consume(Token::IDENTIFIER, "Expected a data type");
         Token name = consume(Token::IDENTIFIER, "Expected an identifier");
-        consume(Token::COLON, "Expected : after param name");
-        Token type = consume(Token::DATA_TYPE, "Expected a data type");
-            if(peek().type != Token::C_PAREN) {
-                consume(Token::COMMA, "Expected comma after param");
-            }
+        if(peek().type != Token::C_PAREN) {
+            consume(Token::COMMA, "Expected comma after param");
+        }
         params.push_back(std::pair<Token,Token>{name, type});
     }
-    Token returnType = Token(Token::DATA_TYPE,0,"void"); //TODO create vod data type;
-    if(match({Token::ARROW})) {
-        returnType = advance();
-    }
+
     consume(Token::O_ACCOL, "Expected accolade before function body");
 
     std::vector<Statement*> statements;
     while (!match({Token::C_ACCOL})) {
         statements.push_back(statement());
     }
-    return new FunDecl(funName, returnType, params, statements);
-//    consume(Token::O_ACCOL, "Expected accolade after function body");
+#ifdef DEBUG_INFO
+    st_counter = 0;
+#endif
+    return new FunDecl(identifier, returnType, params, statements);
+}
 
-
-
-    return nullptr;
+Statement *Parser::returnStatement() {
+    debug();
+    Expression* value = parseExpr();
+    expectType(advance(), Token::SEMICOL);
+    return new ReturnStmt(value);
 }
 
 Statement* Parser::exprStatement() {
@@ -234,7 +247,10 @@ Expression* Parser::parsePrimary() {
         return value;
     }else if(match({Token::IDENTIFIER})) {
         return new ExprVar(previous());
+    }else{
+        std::cout<<previous().typeToStr()<<"\n";
     }
+    std::cout<<"idk: "<<previous()<<"\n";
     error(peek(),"Expected expression");
 }
 
@@ -281,6 +297,8 @@ Token Parser::consume(Token::Type type, std::string message) {
 
     error(peek(), message);
 }
+
+
 
 
 

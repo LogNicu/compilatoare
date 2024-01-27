@@ -51,6 +51,8 @@ add_executable(another_LL_test main.cpp
         backend/instructions/implementations/Instruction.cpp
         backend/instructions/classes/Instruction.h
         backend/implementations/AlmostOptimizer.cpp
-        backend/classes/AlmostOptimizer.h)
+        backend/classes/AlmostOptimizer.h
+        frontend/implementations/statements/ReturnStmt.cpp
+        frontend/classes/statements/ReturnStmt.h)
 
 add_dependencies(another_LL_test lexer_target)

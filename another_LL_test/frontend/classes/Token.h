@@ -46,6 +46,7 @@ public:
         DATA_TYPE,
         NUMBER,
         IDENTIFIER,
+        RETURN,
         //////
         LET, //let
         ERROR_TOK, //token used when no rule matches

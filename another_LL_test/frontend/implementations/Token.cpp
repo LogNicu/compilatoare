@@ -39,6 +39,7 @@ const std::unordered_map<Token::Type,std::string> Token::toStr = {
         {DATA_TYPE, stringify(DATA_TYPE)},
         {NUMBER,   stringify(NUMBER)},
         {IDENTIFIER, stringify(IDENTIFIER)},
+        {RETURN, stringify(RETURN)},
         {LET, stringify(LET)},
         {ERROR_TOK, stringify(ERROR_TOK)},
         {M_EOF,    stringify(M_EOF)}

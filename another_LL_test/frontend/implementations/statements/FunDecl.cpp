@@ -17,7 +17,7 @@ void FunDecl::print(int level) {
     for(auto stmt: statements) {
         stmt->print(level+1);
     }
-    std::cout<<"\n";
+    std::cout<<"}\n";
 
 }
 

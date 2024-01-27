@@ -30,7 +30,7 @@ std::tuple<std::vector<Instruction>,int> Generator::generate(Expression* expr) {
         auto [vec_discard_me,sub_reg_left] = generate(ex->left);
         auto [vec_discard_me2,sub_reg_right] = generate(ex->right);
         if (!binary_expr_map.contains(ex->tokOperator.lexemme)) {
-            std::cout<<"unknown op";
+            throw std::runtime_error("Unknown OP");
         }else{
             std::vector<Operand> ops = {
                     {OperandType::REG, regno++},
@@ -63,7 +63,7 @@ std::tuple<std::vector<Instruction>,int> Generator::generate(Expression* expr) {
             instructionList.emplace_back(t, ops);
             return {instructionList,regno-1};
         }else{
-            std::cout<<"Unwnown unary\n";
+            throw std::runtime_error("Unknown unary");
         }
     }else if( dynamic_cast<ExprLiteral*>(expr) != nullptr) {
         auto ex = dynamic_cast<ExprLiteral *>(expr);
@@ -75,7 +75,7 @@ std::tuple<std::vector<Instruction>,int> Generator::generate(Expression* expr) {
         instructionList.emplace_back(t, ops);
         return {instructionList,regno-1};
     }else {
-        std::cout<<"Unknown expression";
+        expr->print();
+        throw std::runtime_error("Unknown expression");
     }
-    throw std::runtime_error("should be unreachable");
 }

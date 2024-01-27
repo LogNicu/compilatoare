@@ -7,6 +7,7 @@
 #include "Lexer.h"
 #include "expressions/Expression.h"
 #include "statements/Statement.h"
+#include "Token.h"
 
 class Parser {
 
@@ -28,8 +29,9 @@ public:
     void parse();
     Statement* statement();
     Statement* exprStatement();
-    Statement* varDecl();
-    Statement* funStmt();
+    Statement* varDecl(Token dataType, Token identifier);
+    Statement* returnStatement();
+    Statement* funStmt(Token returnType, Token identifier);
     ///Expressions
     Expression *parseExpr();
     Expression *parseLogicOr();

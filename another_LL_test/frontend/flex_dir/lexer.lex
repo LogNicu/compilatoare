@@ -23,7 +23,6 @@ Token getToken() {
 %}
 WHT [ \t\r]
 ANY_WHT {WHT}*
-%x DATA_TYPE_STATE
 
 %%
 
@@ -33,25 +32,23 @@ ANY_WHT {WHT}*
 	line_counter++;
 }
 
-"fn" {emitToken({Token::FN,0,"fn",line_counter}); return Token::FN;}
-
-"let" { //let has to be put before identifier so identifier doesn't match first
-	emitToken({Token::LET,0,"let",line_counter}); return Token::R_SHIFT;
-} 
-
-_*[a-zA-Z]+ {
-	Token tok = {Token::IDENTIFIER, 0 , std::string(yytext),line_counter};
-	emitToken(tok);
-}
+"return" {emitToken({Token::RETURN,0,"return",line_counter}); return Token::RETURN;}
 
 
 [0-9]+("."[0-9]+)?  {
     emitToken({Token::NUMBER, std::stod(yytext),std::string(yytext),line_counter});/* parse a floating point number */
     return Token::NUMBER;
 }
+
+_*[a-zA-Z_0-9]+ {
+	Token tok = {Token::IDENTIFIER, 0 , std::string(yytext),line_counter};
+	emitToken(tok);
+}
+
+
 [*+-/()!><&|^;=,{}]  {
 
-	emitToken({(Token::Type) yytext[0], 0, std::string(yytext)}); 
+	emitToken({(Token::Type) yytext[0], 0, std::string(yytext), line_counter});
 	return (Token::Type) yytext[0];
 }
 
@@ -74,31 +71,8 @@ _*[a-zA-Z]+ {
 "<<" {emitToken({Token::L_SHIFT,0,"<<",line_counter}); return Token::L_SHIFT;}
 ">>" {emitToken({Token::R_SHIFT,0,">>",line_counter}); return Token::R_SHIFT;}
 
-":" {
-	emitToken({Token::COLON, 0, std::string(yytext)});
-	yy_push_state(DATA_TYPE_STATE);
-}
 
 
-"->"  {
-	emitToken({Token::ARROW,0,"->",line_counter});
-	yy_push_state(DATA_TYPE_STATE);
-}
-
-<DATA_TYPE_STATE>[a-zA-Z]+[0-9]* {
-	Token tok = {Token::DATA_TYPE, 0 , std::string(yytext),line_counter};
-	emitToken(tok);
-	yy_pop_state();
-}
-
-<DATA_TYPE_STATE>{WHT} /*skip whitespace*/
-<DATA_TYPE_STATE>\n {
-	line_counter++;
-}
-<DATA_TYPE_STATE>. {
-	emitToken({Token::ERROR_TOK,0,std::string(yytext),line_counter});
-	return Token::ERROR_TOK;
-}
 
 <<EOF>> {emitToken({Token::M_EOF,0,"END",line_counter}); return Token::M_EOF;};
 
