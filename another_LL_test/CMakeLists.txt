@@ -49,6 +49,8 @@ add_executable(another_LL_test main.cpp
         frontend/implementations/statements/FunDecl.cpp
         frontend/classes/statements/FunDecl.h
         backend/instructions/implementations/Instruction.cpp
-        backend/instructions/classes/Instruction.h)
+        backend/instructions/classes/Instruction.h
+        backend/implementations/AlmostOptimizer.cpp
+        backend/classes/AlmostOptimizer.h)
 
 add_dependencies(another_LL_test lexer_target)

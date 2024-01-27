@@ -3,6 +3,7 @@
 #include <fstream>
 #include "frontend/classes/Parser.h"
 #include "backend/classes/Generator.h"
+#include "backend/classes/AlmostOptimizer.h"
 #include "frontend/classes/statements/ExprStmt.h"
 #include "backend/instructions/classes/Instruction.h"
 
@@ -19,8 +20,17 @@ int main(int argc, char *argv[]) {
     while(std::getline(std::cin,line)) {
         Parser p(line);
         auto* statement = dynamic_cast<ExprStmt *>(p.exprStatement());
-        auto regno_discard_me = Generator::generate(statement->expr);
-        for(auto inst: Generator::instructionList) {
+        auto [instructionList, regno_discard_me] = Generator::generate(statement->expr);
+        for(auto inst: instructionList) {
+            std::cout<<"\t"<<InstructionTypeToString(inst.instr)<<" ";
+            for (auto op: inst.operands) {
+                std::cout<<"["<<OperandTypeToString(op.type)<<"]"<<op.op<<" ";
+            }
+            std::cout<<"\n";
+        }
+        auto almostOptimied = AlmostOptimizer::generate(instructionList);
+        std::cout<<"=========TEST OPTIMIZATION==============\n";
+        for(auto inst: almostOptimied) {
             std::cout<<"\t"<<InstructionTypeToString(inst.instr)<<" ";
             for (auto op: inst.operands) {
                 std::cout<<"["<<OperandTypeToString(op.type)<<"]"<<op.op<<" ";

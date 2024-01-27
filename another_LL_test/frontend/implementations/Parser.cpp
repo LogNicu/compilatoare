@@ -103,9 +103,9 @@ Statement *Parser::funStmt() {
         Token name = consume(Token::IDENTIFIER, "Expected an identifier");
         consume(Token::COLON, "Expected : after param name");
         Token type = consume(Token::DATA_TYPE, "Expected a data type");
-        if(peek().type != Token::C_PAREN) {
-            consume(Token::COMMA, "Expected comma after param");
-        }
+            if(peek().type != Token::C_PAREN) {
+                consume(Token::COMMA, "Expected comma after param");
+            }
         params.push_back(std::pair<Token,Token>{name, type});
     }
     Token returnType = Token(Token::DATA_TYPE,0,"void"); //TODO create vod data type;

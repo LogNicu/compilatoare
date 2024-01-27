@@ -26,9 +26,9 @@ enum class OperandType {
 
 class Operand {
 public:
-    const OperandType type;
-    const std::string op;
-    Operand(const OperandType type, const std::string op);
+    OperandType type;
+    int op;
+    Operand(const OperandType type, const int op);
 };
 enum class InstructionType {
     LOAD, MOVE,
@@ -47,8 +47,8 @@ enum class InstructionType {
 
 class Instruction {
 public:
-    const InstructionType instr;
-    const std::vector<Operand> operands;
+    InstructionType instr;
+    std::vector<Operand> operands;
     Instruction(const InstructionType instr, const std::vector<Operand> operands);
 };
 

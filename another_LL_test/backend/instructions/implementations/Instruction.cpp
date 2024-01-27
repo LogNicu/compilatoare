@@ -4,6 +4,6 @@
 
 #include "../classes/Instruction.h"
 
-Operand::Operand(const OperandType type, const std::string op) : type(type), op(op) {}
+Operand::Operand(const OperandType type, const int op) : type(type), op(op) {}
 
 Instruction::Instruction(const InstructionType instr, const std::vector<Operand> operands) : instr(instr), operands(operands){}

@@ -13,8 +13,7 @@
 class Generator {
     static int regno;
 public:
-    static std::vector<Instruction> instructionList;
-    static int generate(Expression* expr);
+    static std::tuple<std::vector<Instruction>,int> generate(Expression* expr);
 };
 
 
