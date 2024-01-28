@@ -12,6 +12,14 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 class LLVMGenerator {
+
+    enum class ParamType{
+        m_AllocaInst,
+        m_funArg,
+        m_literal,
+        OTHER
+    };
+
     struct Scope {
         std::unordered_map<std::string, llvm::Argument*> *llvm_args_map;
         std::unordered_map<std::string, llvm::Value*> *variables;
@@ -20,22 +28,24 @@ class LLVMGenerator {
         Scope(std::unordered_map<std::string, llvm::Value*> *ariables);
         Scope(std::unordered_map<std::string, llvm::Argument*> *llvm_args_map,
               std::unordered_map<std::string, llvm::Value*> *variables);
-        llvm::Value* get(std::string key);
+        std::pair<llvm::Value*, ParamType> get(std::string key);
         void put(std::string key, llvm::Value* value);
     };
     std::unordered_map<std::string, llvm::Function*> globalScope;
     llvm::IRBuilder<> *pBuilder = 0;
-    llvm::Value* getBinaryExprValue(std::string key, llvm::Value *left, llvm::Value *right);
+    std::pair<llvm::Value*, LLVMGenerator::ParamType> getBinaryExprValue(std::string key, llvm::Value *left,
+                                                                         ParamType lType, llvm::Value *right, ParamType rType);
     void parseVarDecl(Statement* stmt, Scope* scope);
     void parseReturn(Statement* stmt, Scope* scope);
     void parseExprStmt(Statement* stmt, Scope* scope = nullptr);
     static llvm::LLVMContext context;
     llvm::Module* Mod;
 public:
-    LLVMGenerator();
-    llvm::Value* exprEval(Expression* expression, Scope* scope);
+    LLVMGenerator(std::string srcFile);
+    ~LLVMGenerator();
+    std::pair<llvm::Value*, LLVMGenerator::ParamType> exprEval(Expression* expression, Scope* scope);
     llvm::Function* parseFunction(Statement* stmt);
-    void generate(std::vector<Statement*> program);
+    llvm::Module* generate(std::vector<Statement*> program);
 
 };
 

@@ -7,7 +7,10 @@
 #include "frontend/classes/statements/ExprStmt.h"
 #include "backend/instructions/classes/Instruction.h"
 #include "backend/classes/LLVMGenerator.h"
-
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/Path.h>
+#include <llvm/Support/FileSystem.h>
+#include <filesystem>
 int main(int argc, char *argv[]) {
     std::string line;
     if(argc > 1) {
@@ -49,10 +52,10 @@ int main(int argc, char *argv[]) {
 //    }
 
 //////////////////////////////////////////////////////////////////
-    std::string filepath = "/home/nicu/Projects/compilatoare/another_LL_test/code.c";
-
+    std::string fileName = "/home/nicu/Projects/compilatoare/another_LL_test/code.c";
+    std::filesystem::path filePath(fileName);
     // Open the file
-    std::ifstream file(filepath);
+    std::ifstream file(filePath);
 
     // Check if the file is open
 
@@ -68,9 +71,14 @@ int main(int argc, char *argv[]) {
         std::string fileContent = buffer.str();
         Parser p(fileContent);
         auto program = p.parse();
-        LLVMGenerator().generate(program);
+        std::filesystem::path outFile = filePath;
+        outFile.replace_extension("ll");
+        llvm::Module* mod = LLVMGenerator(outFile.filename().string()).generate(program);
+        std::error_code err;
+        llvm::raw_fd_ostream output(mod->getName(), err, llvm::sys::fs::OF_Text);
+        mod->print(output, nullptr);
     } else {
-        std::cerr << "Unable to open the file: " << filepath << std::endl;
+        std::cerr << "Unable to open the file: " << filePath.string() << std::endl;
     }
 
     return 0;

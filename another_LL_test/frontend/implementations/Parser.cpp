@@ -106,7 +106,6 @@ Statement* Parser::varDecl(Token dataType, Token identifier) {
         return stmt;
     }
     if(match({Token::EQUAL})) {
-        consume(Token::EQUAL);
         stmt->initializer = parseExpr();
     }
     if(peek().type == Token::COMMA) {
@@ -114,15 +113,14 @@ Statement* Parser::varDecl(Token dataType, Token identifier) {
         while (match({Token::COMMA})){
             Token identifier = consume(Token::IDENTIFIER, "Expected identifier");
             Expression *expr = nullptr;
-            if(peek().type == Token::EQUAL) {
-                consume(Token::EQUAL);
+            if(match({Token::EQUAL})) {
                 expr = parseExpr();
             }
             others.push_back({identifier, expr});
         }
         stmt->others = others;
     }
-    consume(Token::SEMICOL);
+    consume(Token::SEMICOL, "Expected a semicolon here");
 
     return stmt;
 

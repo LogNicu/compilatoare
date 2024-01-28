@@ -26,6 +26,10 @@ ANY_WHT {WHT}*
 
 %%
 
+
+"//".*\n  {line_counter++;}/*Ignore single line comments*/
+
+
 {WHT}	/* Skip whitespace */
 
 \n {
