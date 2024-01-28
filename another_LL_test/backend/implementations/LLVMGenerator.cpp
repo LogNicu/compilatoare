@@ -13,6 +13,7 @@
 #include "../../frontend/classes/statements/VarStmt.h"
 #include "../../frontend/classes/statements/ReturnStmt.h"
 #include "../../frontend/classes/expressions/ExprVar.h"
+#include "../../frontend/classes/expressions/ExprCall.h"
 
 using llvm::IRBuilderBase;
 using llvm::Value;
@@ -22,9 +23,12 @@ using llvm::IRBuilder;
 
 llvm::LLVMContext LLVMGenerator::context;
 
+
+
 LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *llvm_args_map) : llvm_args_map(llvm_args_map),
                                                             variables(new std::unordered_map<std::string, llvm::Value *>){}
 
+LLVMGenerator::Scope::Scope() : variables(new std::unordered_map<std::string, llvm::Value *>){}
 LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Value *> *variables) :variables(variables),
                                                                                         llvm_args_map(nullptr){}
 
@@ -39,15 +43,6 @@ llvm::Value *LLVMGenerator::Scope::get(std::string key) {
     if(variables->contains(key)) {
         return (*variables)[key];
     }
-    std::cout<<"========================\n";
-    for(auto it: *llvm_args_map) {
-        llvm::outs()<<it.first<<" <-> ";it.second->print(llvm::outs());llvm::outs()<<"\n";
-    }
-    std::cout<<"========================\n";
-    for(auto it: *variables) {
-        llvm::outs()<<it.first<<" <-> ";it.second->print(llvm::outs());llvm::outs()<<"\n";
-    }
-    std::cout<<"========================\n";
     std::string error_message = "Couldn't get variable from scope\n";
     error_message += std::string{"llvm_args_map -> "} + (llvm_args_map != nullptr ? "size: "+std::to_string(llvm_args_map->size())+"\n":"is null\n");
     error_message += std::string{"variables -> "} + (variables != nullptr ? "size: "+std::to_string(variables->size())+"\n":"is null\n");
@@ -148,10 +143,23 @@ llvm::Value *LLVMGenerator::exprEval(Expression *expr, Scope* scope) {
         }else{
             throw std::runtime_error("Unknown literal");
         }
-    }if(dynamic_cast<ExprVar*>(expr) != nullptr) {
+    }else if(dynamic_cast<ExprVar*>(expr) != nullptr) {
         auto ex = dynamic_cast<ExprVar *>(expr);
         std::string &varName = ex->varName.lexemme;
         return scope->get(varName);
+    }else if(dynamic_cast<ExprCall*>(expr) != nullptr){
+        auto ex = dynamic_cast<ExprCall*>(expr);
+        auto functionName = dynamic_cast<ExprVar*>(ex->funName);
+        if(!globalScope.contains(functionName->varName.lexemme)) {
+            throw std::runtime_error("Function doesn't exist\n");
+        }
+        auto func =  globalScope[functionName->varName.lexemme];
+        std::vector<Value*> arguments;
+        for (auto arg: ex->arguments) {
+            arguments.push_back(exprEval(arg,scope));
+        }
+        auto callInst = pBuilder->CreateCall(func, arguments);
+        return callInst;
     }else {
         expr->print();
         throw std::runtime_error("Unknown expression");
@@ -203,6 +211,10 @@ llvm::Function *LLVMGenerator::parseFunction(Statement *stmt) {
             /*isVarArg*/ false);
     llvm::Function* llvmFunction = llvm::Function::Create(funcType, llvm::GlobalValue::ExternalLinkage, func->name.lexemme, Mod);
     llvmFunction->setCallingConv(llvm::CallingConv::C);
+    if(globalScope.contains(func->name.lexemme)) {
+        throw std::runtime_error("Function already exists\n");
+    }
+    globalScope[func->name.lexemme]= llvmFunction;
     {
         int index = 0;
         for (llvm::Function::arg_iterator args = llvmFunction->arg_begin(); args != llvmFunction->arg_end(); args++) {

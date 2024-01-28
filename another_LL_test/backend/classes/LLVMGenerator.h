@@ -16,13 +16,14 @@ class LLVMGenerator {
         std::unordered_map<std::string, llvm::Argument*> *llvm_args_map;
         std::unordered_map<std::string, llvm::Value*> *variables;
         Scope(std::unordered_map<std::string, llvm::Argument*> *llvm_args_map);
+        Scope();
         Scope(std::unordered_map<std::string, llvm::Value*> *ariables);
         Scope(std::unordered_map<std::string, llvm::Argument*> *llvm_args_map,
               std::unordered_map<std::string, llvm::Value*> *variables);
         llvm::Value* get(std::string key);
         void put(std::string key, llvm::Value* value);
     };
-
+    std::unordered_map<std::string, llvm::Function*> globalScope;
     llvm::IRBuilder<> *pBuilder = 0;
     llvm::Value* getBinaryExprValue(std::string key, llvm::Value *left, llvm::Value *right);
     void parseVarDecl(Statement* stmt, Scope* scope);

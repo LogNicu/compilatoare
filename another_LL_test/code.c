@@ -11,5 +11,5 @@ int f2(int a, int b, int c, int d) {
     x = b * b;
     y = 4 * a * c;
     x = x - y;
-    return x;
+    return x+ f1(1,2,y);
 }

@@ -9,9 +9,9 @@
 #include "Expression.h"
 
 class ExprCall: public Expression {
+public:
     Expression* funName;
     std::vector<Expression*> arguments;
-public:
     ExprCall(Expression* funName, std::vector<Expression*> arguments);
     void print(int level = 0) override;
     ~ExprCall() override;
