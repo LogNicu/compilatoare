@@ -17,19 +17,21 @@ class LLVMGenerator {
         m_AllocaInst,
         m_funArg,
         m_literal,
+        m_Store,
         OTHER
     };
 
     struct Scope {
         std::unordered_map<std::string, llvm::Argument*> *llvm_args_map;
         std::unordered_map<std::string, llvm::Value*> *variables;
+        std::unordered_map<std::string, llvm::Value*> *stores;
         Scope(std::unordered_map<std::string, llvm::Argument*> *llvm_args_map);
         Scope();
         Scope(std::unordered_map<std::string, llvm::Value*> *ariables);
         Scope(std::unordered_map<std::string, llvm::Argument*> *llvm_args_map,
               std::unordered_map<std::string, llvm::Value*> *variables);
         std::pair<llvm::Value*, ParamType> get(std::string key);
-        void put(std::string key, llvm::Value* value);
+        void put(std::string key, llvm::Value* value, ParamType type);
     };
     std::unordered_map<std::string, llvm::Function*> globalScope;
     llvm::IRBuilder<> *pBuilder = 0;

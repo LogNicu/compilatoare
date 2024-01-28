@@ -1,18 +1,18 @@
 
 //testing single line: non turing-complete C
 
-int idk() {
+int pi200() {
     return 314;
 }
 
-int pi100(int a, int b, int c) {
+int f1(int a, int b, int c) {
     return b * b - 4 * a * c;
 }
 
-int f1(int a, int b, int c, int d) {
+int pi100(int a, int b) {
     int x, y;
-    x = b ;
-    y = a;
-    x = a;
+    x = b * b;
+    y = 4 * a - 2;
+    x = x - y;
     return x+ f1(1,2,y);
 }
