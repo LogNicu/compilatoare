@@ -101,7 +101,9 @@ Statement* Parser::statement() {
 
 Statement* Parser::varDecl(Token dataType, Token identifier) {
     debug();
-
+    if(match({Token::SEMICOL})) {
+        return new VarStmt(dataType, identifier, nullptr);
+    }
     expectType(advance(), Token::EQUAL);
     Expression *expr = parseExpr();
     expectType(advance(), Token::SEMICOL);
@@ -151,7 +153,7 @@ Statement* Parser::exprStatement() {
 
 Expression *Parser::parseExpr() {
     debug();
-    Expression* exp = parseLogicOr();
+    Expression* exp = parseAssignment();
     return exp;
 }
 
@@ -160,6 +162,25 @@ Expression* Parser::parseBinaryExpr(std::vector<Token::Type> operators, parseBin
     while (match(operators)) {
         Token next = previous();
         Expression* right = (this->*operand)();
+        left = new ExprBinary(next, left,right);
+    }
+    return left;
+}
+
+
+Expression *Parser::parseAssignment() {
+    debug();
+    //return parseBinaryExpr({Token::EQUAL}, &Parser::parseLogicOr);
+    //TODO: would have been nice to call parseBinaryExpr for assignment
+    //but I want to check if the left value is an identifier
+    Expression* left = parseLogicOr();
+    while (match({Token::EQUAL})) {
+        if(dynamic_cast<ExprVar*> (left) == nullptr) {
+            left->print();
+            error(previous(), "Cannot assign to non-variable");
+        }
+        Token next = previous();
+        Expression* right = parseLogicOr();
         left = new ExprBinary(next, left,right);
     }
     return left;
@@ -300,6 +321,8 @@ Token Parser::consume(Token::Type type, std::string message) {
 
     error(peek(), message);
 }
+
+
 
 
 

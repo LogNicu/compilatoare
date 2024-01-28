@@ -34,6 +34,7 @@ public:
     Statement* funStmt(Token returnType, Token identifier);
     ///Expressions
     Expression *parseExpr();
+    Expression *parseAssignment();
     Expression *parseLogicOr();
     Expression *parseLogicAnd();
     Expression *parseBitOr();
