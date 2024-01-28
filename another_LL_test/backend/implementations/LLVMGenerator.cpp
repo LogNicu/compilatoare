@@ -26,10 +26,13 @@ llvm::LLVMContext LLVMGenerator::context;
 
 
 LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *llvm_args_map) : llvm_args_map(llvm_args_map),
-                                                            variables(new std::unordered_map<std::string, llvm::Value *>){}
+                                                            variables(new std::unordered_map<std::string, llvm::Value *>),
+                                                            stores(new std::unordered_map<std::string, llvm::Value *>){}
 
-LLVMGenerator::Scope::Scope() : variables(new std::unordered_map<std::string, llvm::Value *>){}
+LLVMGenerator::Scope::Scope() : variables(new std::unordered_map<std::string, llvm::Value *>),
+                                stores(new std::unordered_map<std::string, llvm::Value *>){}
 LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Value *> *variables) :variables(variables),
+                                                                                        stores(new std::unordered_map<std::string, llvm::Value *>),
                                                                                         llvm_args_map(nullptr){}
 
 LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *llvm_args_map,
@@ -39,6 +42,9 @@ LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *l
 std::pair<llvm::Value*, LLVMGenerator::ParamType> LLVMGenerator::Scope::get(std::string key) {
     if(llvm_args_map->contains(key)) {
         return {(*llvm_args_map)[key], ParamType::m_funArg};
+    }
+    if(stores->contains(key)) {
+        return {(*stores)[key], ParamType::m_Store};
     }
     if(variables->contains(key)) {
         return {(*variables)[key], ParamType::m_AllocaInst};
@@ -50,8 +56,15 @@ std::pair<llvm::Value*, LLVMGenerator::ParamType> LLVMGenerator::Scope::get(std:
 
 }
 
-void LLVMGenerator::Scope::put(std::string key, llvm::Value *value) {
-    (*variables)[key] = value;
+void LLVMGenerator::Scope::put(std::string key, llvm::Value *value, ParamType type) {
+    if (type == ParamType::m_Store) {
+        (*stores)[key] = value;
+    }else if(type == ParamType::m_AllocaInst) {
+        (*variables)[key] = value;
+    }else if(type == ParamType::m_funArg) {
+        std::cout<<"DEBUG ERROR\n";
+    }
+
 }
 
 llvm::Module* LLVMGenerator::generate(std::vector<Statement*> program) {
@@ -185,7 +198,21 @@ std::pair<llvm::Value*, LLVMGenerator::ParamType> LLVMGenerator::exprEval(Expres
         auto func =  globalScope[functionName->varName.lexemme];
         std::vector<Value*> arguments;
         for (auto arg: ex->arguments) {
-            arguments.push_back(exprEval(arg,scope).first);
+            auto arg1 = exprEval(arg, scope);
+            if(arg1.second == ParamType::m_AllocaInst) {
+                auto IntType = llvm::IntegerType::getInt32Ty(context);
+                ExprVar* exp1 = dynamic_cast<ExprVar*>(arg);
+                if(exp1 == nullptr) {std::cerr<<"expression should have been cast\n";}
+                auto left = scope->get(exp1->varName.lexemme).first;
+                llvm::LoadInst* left1 = pBuilder->CreateLoad(IntType, left, false, left->getName());
+                left1->setAlignment(llvm::Align(4));
+                arguments.push_back(left1);
+                std::cout<<"HERE: "+exp1->varName.lexemme<<"\n";
+            }else{
+                std::cout<<"HERE2\n";
+                arguments.push_back(arg1.first);
+            }
+
         }
         auto callInst = pBuilder->CreateCall(func, arguments);
         return {callInst, ParamType::OTHER};
@@ -201,16 +228,19 @@ void LLVMGenerator::parseVarDecl(Statement* stmt, Scope* scope) {
     llvm::AllocaInst* var = pBuilder->CreateAlloca(IntType, nullptr,varDecl->varName.lexemme);
     if(varDecl->initializer != nullptr) {
         auto storeInst = pBuilder->CreateStore(exprEval(varDecl->initializer, scope).first, var);
-//        scope->put(varDecl->varName.lexemme, storeInst);
+        scope->put(varDecl->varName.lexemme, storeInst, ParamType::m_Store);
+    }else{
+        scope->put(varDecl->varName.lexemme, var, ParamType::m_AllocaInst);
     }
-    scope->put(varDecl->varName.lexemme, var);
     if(varDecl->others.size() > 0) {
         for(std::pair<Token, Expression*> v1 : varDecl->others) {
             llvm::AllocaInst* var1 = pBuilder->CreateAlloca(IntType, nullptr,v1.first.lexemme);
             if(v1.second != nullptr) {
                 auto storeInst = pBuilder->CreateStore(exprEval(v1.second, scope).first, var1);
+                scope->put(v1.first.lexemme, storeInst, ParamType::m_Store);
+            }else{
+                scope->put(v1.first.lexemme, var1, ParamType::m_AllocaInst);
             }
-            scope->put(v1.first.lexemme, var1);
 
         }
     }
