@@ -19,12 +19,46 @@ using llvm::Value;
 using llvm::Twine;
 using llvm::IRBuilder;
 
-using TypeDef1 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&, bool, bool);
-using TypeDef2 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&);
-using TypeDef3 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&, bool );
-using TypeDef4 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&, bool );
 
 llvm::LLVMContext LLVMGenerator::context;
+
+LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *llvm_args_map) : llvm_args_map(llvm_args_map),
+                                                            variables(new std::unordered_map<std::string, llvm::Value *>){}
+
+LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Value *> *variables) :variables(variables),
+                                                                                        llvm_args_map(nullptr){}
+
+LLVMGenerator::Scope::Scope(std::unordered_map<std::string, llvm::Argument *> *llvm_args_map,
+                            std::unordered_map<std::string, llvm::Value *> *variables): llvm_args_map(llvm_args_map),
+                                                                                        variables(variables){}
+
+llvm::Value *LLVMGenerator::Scope::get(std::string key) {
+    if(llvm_args_map->contains(key)) {
+        return (*llvm_args_map)[key];
+    }
+    if(variables->contains(key)) {
+        return (*variables)[key];
+    }
+    std::cout<<"========================\n";
+    for(auto it: *llvm_args_map) {
+        llvm::outs()<<it.first<<" <-> ";it.second->print(llvm::outs());llvm::outs()<<"\n";
+    }
+    std::cout<<"========================\n";
+    for(auto it: *variables) {
+        llvm::outs()<<it.first<<" <-> ";it.second->print(llvm::outs());llvm::outs()<<"\n";
+    }
+    std::cout<<"========================\n";
+    std::string error_message = "Couldn't get variable from scope\n";
+    error_message += std::string{"llvm_args_map -> "} + (llvm_args_map != nullptr ? "size: "+std::to_string(llvm_args_map->size())+"\n":"is null\n");
+    error_message += std::string{"variables -> "} + (variables != nullptr ? "size: "+std::to_string(variables->size())+"\n":"is null\n");
+    throw std::runtime_error(error_message);
+
+}
+
+void LLVMGenerator::Scope::put(std::string key, llvm::Value *value) {
+    (*variables)[key] = value;
+}
+
 void LLVMGenerator::generate(std::vector<Statement*> program) {
     if (pBuilder)
         delete pBuilder;
@@ -32,8 +66,7 @@ void LLVMGenerator::generate(std::vector<Statement*> program) {
 
     for(Statement* statement: program) {
         if(dynamic_cast<ExprStmt*>(statement) != nullptr){
-            auto exprStat = dynamic_cast<ExprStmt*>(statement);
-            llvm::Value* val = exprEval(exprStat->expr);
+            parseExprStmt(statement, nullptr);
         }else if(dynamic_cast<FunDecl*>(statement) != nullptr) {
             parseFunction(statement);
         }else{
@@ -46,12 +79,15 @@ void LLVMGenerator::generate(std::vector<Statement*> program) {
 
 
 Value* LLVMGenerator::getBinaryExprValue(std::string key, Value *left, Value *right) {
+    using TypeDef1 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&, bool, bool);
+    using TypeDef2 = Value* (IRBuilderBase::*)(Value*, Value*, const Twine&);
     static std::unordered_map<std::string, TypeDef1> binary_expr_map1 = {
             {"+", &IRBuilderBase::CreateAdd},
             {"-", &IRBuilderBase::CreateSub},
             {"<<",&IRBuilderBase::CreateShl},
             {"*", &IRBuilderBase::CreateMul}
     };
+
     static std::unordered_map<std::string, TypeDef2> binary_expr_map2 = {
             {"&", &IRBuilderBase::CreateAnd},
             {"|", &IRBuilderBase::CreateOr},
@@ -60,19 +96,17 @@ Value* LLVMGenerator::getBinaryExprValue(std::string key, Value *left, Value *ri
             {"||", &IRBuilderBase::CreateLogicalOr},
             {"==", &IRBuilderBase::CreateICmpEQ},{"!=", &IRBuilderBase::CreateICmpNE},
             {">", &IRBuilderBase::CreateICmpSGT},{"<", &IRBuilderBase::CreateICmpSLT},
-            {">=",&IRBuilderBase::CreateICmpSGE},{"<=",&IRBuilderBase::CreateICmpSLE},
-    };
-    static std::unordered_map<std::string, TypeDef3> binary_expr_map3 = {
-            {"/",&IRBuilderBase::CreateSDiv}
-    };
-    static std::unordered_map<std::string, TypeDef4> binary_expr_map4 = {
-            {">>", &IRBuilderBase::CreateLShr}
+            {">=",&IRBuilderBase::CreateICmpSGE},{"<=",&IRBuilderBase::CreateICmpSLE}
     };
     if(key == "/") {
-        return (pBuilder->*binary_expr_map3[key])(left, right,"",0);
+        return pBuilder->CreateSDiv(left,right);
     }
     if(key == ">>") {
-        return (pBuilder->*binary_expr_map4[key])(left, right,"",0);
+        return pBuilder->CreateLShr(left,right);
+    }
+    if(key == "=") {
+        pBuilder->CreateStore(right, left);
+        return right;
     }
     if(binary_expr_map1.contains(key)) {
         return (pBuilder->*binary_expr_map1[key])(left, right,"",0,0);
@@ -85,12 +119,12 @@ Value* LLVMGenerator::getBinaryExprValue(std::string key, Value *left, Value *ri
 
 }
 
-llvm::Value *LLVMGenerator::exprEval(Expression *expr, std::unordered_map<std::string, llvm::Argument*> *llvm_args_map) {
+llvm::Value *LLVMGenerator::exprEval(Expression *expr, Scope* scope) {
     //TODO could have used the visitor pattern here ?
     if( dynamic_cast<ExprBinary*>(expr) != nullptr) {
         auto ex = dynamic_cast<ExprBinary *>(expr);
-        auto val_left = exprEval(ex->left);
-        auto val_right = exprEval(ex->right);
+        auto val_left = exprEval(ex->left, scope);
+        auto val_right = exprEval(ex->right, scope);
 
         Value* result = getBinaryExprValue(ex->tokOperator.lexemme, val_left, val_right);
         return result;
@@ -99,7 +133,7 @@ llvm::Value *LLVMGenerator::exprEval(Expression *expr, std::unordered_map<std::s
     }else if( dynamic_cast<ExprUnary*>(expr) != nullptr) {
 
         auto ex = dynamic_cast<ExprUnary *>(expr);
-        Value* leftVal = exprEval(ex->right);
+        Value* leftVal = exprEval(ex->right, scope);
         if(ex->tokOperator.lexemme == "!") {
             return pBuilder->CreateNot(leftVal);
         }else if(ex->tokOperator.lexemme == "-") {
@@ -117,34 +151,29 @@ llvm::Value *LLVMGenerator::exprEval(Expression *expr, std::unordered_map<std::s
     }if(dynamic_cast<ExprVar*>(expr) != nullptr) {
         auto ex = dynamic_cast<ExprVar *>(expr);
         std::string &varName = ex->varName.lexemme;
-        if(llvm_args_map == nullptr) {
-            throw std::runtime_error("Used identifier but nothing in args map");
-        }
-        if(!llvm_args_map->contains(varName)) {
-            throw std::runtime_error("Argsmap does not contain the variable name: "+varName);
-        }
-        return (*llvm_args_map)[varName];
+        return scope->get(varName);
     }else {
         expr->print();
         throw std::runtime_error("Unknown expression");
     }
 }
 
- llvm::AllocaInst* LLVMGenerator::parseVarDecl(Statement* stmt) {
+ llvm::AllocaInst* LLVMGenerator::parseVarDecl(Statement* stmt, Scope* scope) {
     VarStmt* varDecl = dynamic_cast<VarStmt*>(stmt);
     auto IntType = llvm::IntegerType::getInt32Ty(context);
     llvm::AllocaInst* var = pBuilder->CreateAlloca(IntType, nullptr,varDecl->varName.lexemme);
     if(varDecl->initializer != nullptr) {
-        pBuilder->CreateStore(exprEval(varDecl->initializer),var);
+        pBuilder->CreateStore(exprEval(varDecl->initializer, scope),var);
     }
+    scope->put(varDecl->varName.lexemme, var);
     return var;
 
 }
 
-void LLVMGenerator::parseReturn(Statement *stmt, std::unordered_map<std::string, llvm::Argument*> *llvm_args_map) {
+void LLVMGenerator::parseReturn(Statement *stmt, Scope* scope) {
     ReturnStmt* returnStmt = dynamic_cast<ReturnStmt*>(stmt);
 
-    llvm::Value * val= exprEval(returnStmt->expr, llvm_args_map);
+    llvm::Value * val= exprEval(returnStmt->expr, scope);
     pBuilder->CreateRet(val);
 
 }
@@ -176,11 +205,14 @@ llvm::Function *LLVMGenerator::parseFunction(Statement *stmt) {
     }
     llvm::BasicBlock* entry = llvm::BasicBlock::Create(context, "entry", llvmFunction);
     pBuilder->SetInsertPoint(entry);
+    Scope scope {&llvm_args_map};
     for(Statement* stmt: func->statements) {
         if(dynamic_cast<VarStmt*>(stmt) != nullptr) {
-            llvm::AllocaInst* variable = parseVarDecl(stmt);
+            llvm::AllocaInst* variable = parseVarDecl(stmt, &scope);
         } else if(dynamic_cast<ReturnStmt*>(stmt) != nullptr) {
-            parseReturn(stmt, &llvm_args_map);
+            parseReturn(stmt, &scope);
+        }else if(dynamic_cast<ExprStmt*>(stmt) != nullptr) {
+            parseExprStmt(stmt,&scope);
         }else {
             std::cout<<"other kind of statement\n";
             stmt->print();
@@ -196,6 +228,8 @@ LLVMGenerator::LLVMGenerator() {
     Mod = new llvm::Module("f.ll", context);
 }
 
-
-
+void LLVMGenerator::parseExprStmt(Statement *stmt, Scope *scope) {
+    ExprStmt* exp = dynamic_cast<ExprStmt*> (stmt);
+    exprEval(exp->expr, scope);
+}
 
