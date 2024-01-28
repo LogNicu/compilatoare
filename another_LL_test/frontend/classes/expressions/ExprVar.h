@@ -9,8 +9,8 @@
 #include "Expression.h"
 
 class ExprVar: public Expression{
-    Token varName;
 public:
+    Token varName;
     ExprVar(Token varName);
     void print(int level = 0) override;
     ~ExprVar() override;

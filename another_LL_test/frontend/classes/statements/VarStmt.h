@@ -10,10 +10,10 @@
 #include "../expressions/Expression.h"
 
 class VarStmt : public Statement{
+public:
     Token varName;
     Token varType;
     Expression* initializer;
-public:
     VarStmt(Token varName, Token varType, Expression* initializer);
     void print(int level = 0) override;
     ~VarStmt() override;

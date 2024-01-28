@@ -6,6 +6,7 @@
 #include "backend/classes/AlmostOptimizer.h"
 #include "frontend/classes/statements/ExprStmt.h"
 #include "backend/instructions/classes/Instruction.h"
+#include "backend/classes/LLVMGenerator.h"
 
 int main(int argc, char *argv[]) {
     std::string line;
@@ -38,7 +39,16 @@ int main(int argc, char *argv[]) {
 //            std::cout<<"\n";
 //        }
 //    }
+//////////////////////////////////////////////////////////////////
+//    while(std::getline(std::cin,line)) {
+//        line += std::to_string(EOF);
+//        Parser p(line);
+//        auto program = p.parse();
+//        LLVMGenerator().generate(program);
+//
+//    }
 
+//////////////////////////////////////////////////////////////////
     std::string filepath = "/home/nicu/Projects/compilatoare/another_LL_test/code.c";
 
     // Open the file
@@ -57,7 +67,8 @@ int main(int argc, char *argv[]) {
         // Get the content of the file as a string
         std::string fileContent = buffer.str();
         Parser p(fileContent);
-        p.parse();
+        auto program = p.parse();
+        LLVMGenerator().generate(program);
     } else {
         std::cerr << "Unable to open the file: " << filepath << std::endl;
     }

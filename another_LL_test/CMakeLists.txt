@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
 project(another_LL_test)
 find_package(FLEX REQUIRED)
-
+find_package(LLVM REQUIRED CONFIG)
 set(CMAKE_CXX_STANDARD 20)
+
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
 
 add_custom_command(
         OUTPUT lex.yy.cc
@@ -53,6 +58,10 @@ add_executable(another_LL_test main.cpp
         backend/implementations/AlmostOptimizer.cpp
         backend/classes/AlmostOptimizer.h
         frontend/implementations/statements/ReturnStmt.cpp
-        frontend/classes/statements/ReturnStmt.h)
+        frontend/classes/statements/ReturnStmt.h
+        backend/implementations/LLVMGenerator.cpp
+        backend/classes/LLVMGenerator.h)
 
 add_dependencies(another_LL_test lexer_target)
+
+target_link_libraries(another_LL_test LLVM)

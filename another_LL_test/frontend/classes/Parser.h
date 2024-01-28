@@ -26,7 +26,7 @@ public:
     Parser(std::string &s);
 
     //Statements
-    void parse();
+    std::vector<Statement*> parse();
     Statement* statement();
     Statement* exprStatement();
     Statement* varDecl(Token dataType, Token identifier);

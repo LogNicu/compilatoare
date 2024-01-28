@@ -60,13 +60,16 @@ void Parser::expectType(Token t, Token::Type type) {
     }
 }
 
-void Parser::parse() {
+std::vector<Statement*> Parser::parse() {
     debug();
+    std::vector<Statement*> statements;
     while (!isAtEnd()) {
         Statement *smt = statement();
-        smt->print();
-        delete smt;
+//        smt->print();
+//        delete smt;
+        statements.push_back(smt);
     }
+    return statements;
 }
 
 Statement* Parser::statement() {
