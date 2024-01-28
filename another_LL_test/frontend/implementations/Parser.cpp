@@ -102,12 +102,12 @@ Statement* Parser::statement() {
 Statement* Parser::varDecl(Token dataType, Token identifier) {
     debug();
     if(match({Token::SEMICOL})) {
-        return new VarStmt(dataType, identifier, nullptr);
+        return new VarStmt(identifier, dataType, nullptr);
     }
     expectType(advance(), Token::EQUAL);
     Expression *expr = parseExpr();
     expectType(advance(), Token::SEMICOL);
-    return new VarStmt(dataType, identifier, expr);
+    return new VarStmt(identifier, dataType, expr);
 
 
 }
