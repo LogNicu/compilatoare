@@ -25,7 +25,7 @@ class LLVMGenerator {
 
     llvm::IRBuilder<> *pBuilder = 0;
     llvm::Value* getBinaryExprValue(std::string key, llvm::Value *left, llvm::Value *right);
-    llvm::AllocaInst* parseVarDecl(Statement* stmt, Scope* scope);
+    void parseVarDecl(Statement* stmt, Scope* scope);
     void parseReturn(Statement* stmt, Scope* scope);
     void parseExprStmt(Statement* stmt, Scope* scope = nullptr);
     static llvm::LLVMContext context;

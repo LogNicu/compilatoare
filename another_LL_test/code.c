@@ -1,9 +1,15 @@
-int myfun(int marg1, int marg2) {
-    int x = 2+3-1/2+3;
-    int y;
-    y = x;
-    marg1 = x*y/2;
-    return marg1;
+int pi100() {
+    return 314;
 }
 
+int f1(int a, int b, int c) {
+    return b * b - 4 * a * c;
+}
 
+int f2(int a, int b, int c, int d) {
+    int x, y;
+    x = b * b;
+    y = 4 * a * c;
+    x = x - y;
+    return x;
+}

@@ -14,6 +14,7 @@ public:
     Token varName;
     Token varType;
     Expression* initializer;
+    std::vector<std::pair<Token, Expression*>> others;
     VarStmt(Token varName, Token varType, Expression* initializer);
     void print(int level = 0) override;
     ~VarStmt() override;

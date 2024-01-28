@@ -158,7 +158,7 @@ llvm::Value *LLVMGenerator::exprEval(Expression *expr, Scope* scope) {
     }
 }
 
- llvm::AllocaInst* LLVMGenerator::parseVarDecl(Statement* stmt, Scope* scope) {
+void LLVMGenerator::parseVarDecl(Statement* stmt, Scope* scope) {
     VarStmt* varDecl = dynamic_cast<VarStmt*>(stmt);
     auto IntType = llvm::IntegerType::getInt32Ty(context);
     llvm::AllocaInst* var = pBuilder->CreateAlloca(IntType, nullptr,varDecl->varName.lexemme);
@@ -166,7 +166,16 @@ llvm::Value *LLVMGenerator::exprEval(Expression *expr, Scope* scope) {
         pBuilder->CreateStore(exprEval(varDecl->initializer, scope),var);
     }
     scope->put(varDecl->varName.lexemme, var);
-    return var;
+    if(varDecl->others.size() > 0) {
+        for(std::pair<Token, Expression*> v1 : varDecl->others) {
+            llvm::AllocaInst* var1 = pBuilder->CreateAlloca(IntType, nullptr,v1.first.lexemme);
+            if(v1.second != nullptr) {
+                pBuilder->CreateStore(exprEval(v1.second, scope),var1);
+            }
+            scope->put(v1.first.lexemme, var1);
+        }
+    }
+
 
 }
 
@@ -208,7 +217,7 @@ llvm::Function *LLVMGenerator::parseFunction(Statement *stmt) {
     Scope scope {&llvm_args_map};
     for(Statement* stmt: func->statements) {
         if(dynamic_cast<VarStmt*>(stmt) != nullptr) {
-            llvm::AllocaInst* variable = parseVarDecl(stmt, &scope);
+            parseVarDecl(stmt, &scope);
         } else if(dynamic_cast<ReturnStmt*>(stmt) != nullptr) {
             parseReturn(stmt, &scope);
         }else if(dynamic_cast<ExprStmt*>(stmt) != nullptr) {

@@ -83,7 +83,7 @@ Statement* Parser::statement() {
             Token identifier = previous();
             if (peek().type == Token::O_PAREN) {
                 stmt = funStmt(dataType, identifier);
-            } else if (peek().type == Token::EQUAL || peek().type == Token::SEMICOL) {
+            } else if (peek().type == Token::EQUAL || peek().type == Token::SEMICOL || peek().type == Token::COMMA) {
                 stmt = varDecl(dataType, identifier);
             } else {
                 error(peek(), "Unexpected token after data type");
@@ -101,13 +101,30 @@ Statement* Parser::statement() {
 
 Statement* Parser::varDecl(Token dataType, Token identifier) {
     debug();
+    VarStmt* stmt = new VarStmt(identifier, dataType, nullptr);
     if(match({Token::SEMICOL})) {
-        return new VarStmt(identifier, dataType, nullptr);
+        return stmt;
     }
-    expectType(advance(), Token::EQUAL);
-    Expression *expr = parseExpr();
-    expectType(advance(), Token::SEMICOL);
-    return new VarStmt(identifier, dataType, expr);
+    if(match({Token::EQUAL})) {
+        consume(Token::EQUAL);
+        stmt->initializer = parseExpr();
+    }
+    if(peek().type == Token::COMMA) {
+        std::vector<std::pair<Token, Expression*>> others;
+        while (match({Token::COMMA})){
+            Token identifier = consume(Token::IDENTIFIER, "Expected identifier");
+            Expression *expr = nullptr;
+            if(peek().type == Token::EQUAL) {
+                consume(Token::EQUAL);
+                expr = parseExpr();
+            }
+            others.push_back({identifier, expr});
+        }
+        stmt->others = others;
+    }
+    consume(Token::SEMICOL);
+
+    return stmt;
 
 
 }
