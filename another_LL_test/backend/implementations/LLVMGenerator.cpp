@@ -207,6 +207,7 @@ std::pair<llvm::Value*, LLVMGenerator::ParamType> LLVMGenerator::exprEval(Expres
                 llvm::LoadInst* left1 = pBuilder->CreateLoad(IntType, left, false, left->getName());
                 left1->setAlignment(llvm::Align(4));
                 arguments.push_back(left1);
+
             }else{
                 arguments.push_back(arg1.first);
             }
